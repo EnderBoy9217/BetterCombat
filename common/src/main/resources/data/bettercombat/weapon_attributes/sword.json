@@ -136,14 +136,14 @@
       {
         "conditions": [
           "NOT_MOUNTED",
-          "DUAL_WIELDING_SAME"
+          "DUAL_WIELDING_ANY"
         ],
         "combo": 5,
         "hitbox": "FORWARD_BOX",
         "damage_multiplier": 1.6,
         "angle": 0,
         "upswing": 0.5,
-        "animation": "bettercombat:dual_handed_slash_uncross",
+        "animation": "bettercombat:dual_handed_slash_cross",
         "swing_sound": {
           "id": "bettercombat:claymore_stab"
         }
@@ -158,7 +158,7 @@
         "damage_multiplier": 1.6,
         "angle": 0,
         "upswing": 0.5,
-        "animation": "bettercombat:dual_handed_slash_cross",
+        "animation": "bettercombat:dual_handed_slash_uncross",
         "swing_sound": {
           "id": "bettercombat:claymore_stab"
         }

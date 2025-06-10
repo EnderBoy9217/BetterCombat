@@ -13,6 +13,9 @@
     "RangedWeaponItemMixin",
     "ServerPlayNetworkHandlerMixin",
     "SweepingEnchantmentMixin",
+    "additions.EatingCancelLivingEntityMixin",
+    "additions.HungerManagerMixin",
+    "additions.MultishotFixLivingEntityMixin",
     "additions.ShieldBreakLivingEntityMixin",
     "additions.ShieldBreakPlayerEntityMixin",
     "additions.ShieldMixin"

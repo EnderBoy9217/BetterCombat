@@ -15,6 +15,12 @@ public class ServerConfig implements ConfigData {
     public float shield_max_health = 10.0F;
     @Comment("Maximum Shield Health to disable")
     public int shield_regen_time = 100;
+    @Comment("Whether consumables should be cancelled when taking damage")
+    public boolean eatingInterruption = true;
+    @Comment("Whether projectiles cause damage immunity. While false, multishot will work properly")
+    public boolean noProjectileImmunity = false;
+    @Comment("Minimum hunger level required to heal. Vanilla: 18, Combat Tests: 7")
+    public int minimumHealingHunger = 7;
     @Comment("""
             Upswing (aka windup) is the first phase of the attack (between clicking and performing the damage).
             Typical duration of upswing is `weapon cooldown * 0.5`. (Weapon specific upswing values can be defined in weapon attributes)
