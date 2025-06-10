@@ -298,7 +298,7 @@ public abstract class MinecraftClientInject implements MinecraftClient_BetterCom
             return;
         }
         this.isHeavyAttacking = isHeavy;
-        var hand = getCurrentHand(); // This is the attack
+        var hand = getCurrentHand();
         if (hand == null) { return; }
         float upswingRate = (float) hand.upswingRate();
         if (upswingTicks > 0
@@ -318,7 +318,7 @@ public abstract class MinecraftClientInject implements MinecraftClient_BetterCom
         upswingStack = player.getMainHandStack();
         float attackCooldownTicksFloat = PlayerAttackHelper.getAttackCooldownTicksCapped(player); // `getAttackCooldownProgressPerTick` should be called `getAttackCooldownLengthTicks`
         if (isHeavy) {
-            attackCooldownTicksFloat *= 1.2F; // Longer cooldown for heavy attacks, will add to config later
+            attackCooldownTicksFloat *= BetterCombat.config.heavy_cooldown_multiplier;
         }
 
         int attackCooldownTicks = Math.round(attackCooldownTicksFloat);

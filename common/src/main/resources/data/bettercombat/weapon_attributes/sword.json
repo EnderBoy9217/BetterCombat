@@ -8,6 +8,16 @@
         "damage_multiplier": 0.8,
         "angle": 120,
         "upswing": 0.5,
+        "animation": "bettercombat:one_handed_slash_switch_blade_left",
+        "swing_sound": {
+          "id": "bettercombat:sword_slash"
+        }
+      },
+      {
+        "hitbox": "HORIZONTAL_PLANE",
+        "damage_multiplier": 0.8,
+        "angle": 120,
+        "upswing": 0.5,
         "animation": "bettercombat:one_handed_slash_horizontal_right",
         "swing_sound": {
           "id": "bettercombat:sword_slash"
@@ -22,17 +32,6 @@
         "swing_sound": {
           "id": "bettercombat:sword_slash"
         }
-      },
-      {
-        "hitbox": "FORWARD_BOX",
-        "damage_multiplier": 1,
-        "angle": 0,
-        "upswing": 0.5,
-        "animation": "bettercombat:one_handed_stab",
-        "swing_sound": {
-          "id": "bettercombat:sword_slash",
-          "pitch": 1.2
-        }
       }
     ],
     "twoHandedAttacks": [
@@ -43,7 +42,7 @@
         "upswing": 0.5,
         "animation": "bettercombat:two_handed_slash_horizontal_right",
         "swing_sound": {
-          "id": "bettercombat:claymore_swing"
+          "id": "bettercombat:sickle_slash"
         }
       },
       {
@@ -53,12 +52,16 @@
         "upswing": 0.5,
         "animation": "bettercombat:two_handed_slash_horizontal_left",
         "swing_sound": {
-          "id": "bettercombat:claymore_swing"
+          "id": "bettercombat:sickle_slash"
         }
       }
     ],
     "heavyAttacks": [
       {
+        "conditions": [
+          "NOT_MOUNTED",
+          "NO_OFFHAND_ITEM"
+        ],
         "hitbox": "HORIZONTAL_PLANE",
         "combo": 4,
         "damage_multiplier": 1.5,
@@ -67,6 +70,126 @@
         "animation": "bettercombat:two_handed_spin",
         "swing_sound": {
           "id": "bettercombat:scythe_slash"
+        }
+      },
+      {
+        "conditions": [
+          "NOT_MOUNTED",
+          "NO_OFFHAND_ITEM"
+        ],
+        "combo": 3,
+        "hitbox": "FORWARD_BOX",
+        "damage_multiplier": 1.5,
+        "angle": 0,
+        "upswing": 0.5,
+        "animation": "bettercombat:two_handed_stab_left",
+        "swing_sound": {
+          "id": "bettercombat:scythe_slash"
+        }
+      },
+      {
+        "conditions": [
+          "NOT_MOUNTED",
+          "NO_OFFHAND_ITEM"
+        ],
+        "combo": 2,
+        "hitbox": "FORWARD_BOX",
+        "damage_multiplier": 1.5,
+        "angle": 0,
+        "upswing": 0.5,
+        "animation": "bettercombat:two_handed_stab_right",
+        "swing_sound": {
+          "id": "bettercombat:scythe_slash"
+        }
+      },
+      {
+        "conditions": [
+          "NOT_MOUNTED",
+          "NO_OFFHAND_ITEM"
+        ],
+        "combo": 0,
+        "hitbox": "FORWARD_BOX",
+        "damage_multiplier": 1.2,
+        "angle": 0,
+        "upswing": 0.5,
+        "animation": "bettercombat:one_handed_stab",
+        "swing_sound": {
+          "id": "bettercombat:claymore_swing"
+        }
+      },
+      {
+        "conditions": [
+          "NOT_MOUNTED",
+          "DUAL_WIELDING_SAME"
+        ],
+        "combo": 5,
+        "hitbox": "FORWARD_BOX",
+        "damage_multiplier": 1.6,
+        "angle": 0,
+        "upswing": 0.5,
+        "animation": "bettercombat:dual_handed_slash_uncross",
+        "swing_sound": {
+          "id": "bettercombat:claymore_stab"
+        }
+      },
+      {
+        "conditions": [
+          "NOT_MOUNTED",
+          "DUAL_WIELDING_SAME"
+        ],
+        "combo": 4,
+        "hitbox": "FORWARD_BOX",
+        "damage_multiplier": 1.6,
+        "angle": 0,
+        "upswing": 0.5,
+        "animation": "bettercombat:dual_handed_slash_cross",
+        "swing_sound": {
+          "id": "bettercombat:claymore_stab"
+        }
+      },
+      {
+        "conditions": [
+          "NOT_MOUNTED",
+          "DUAL_WIELDING_SAME"
+        ],
+        "combo": 2,
+        "hitbox": "FORWARD_BOX",
+        "damage_multiplier": 1.4,
+        "angle": 0,
+        "upswing": 0.5,
+        "animation": "bettercombat:dual_handed_stab",
+        "swing_sound": {
+          "id": "bettercombat:claymore_stab"
+        }
+      },
+      {
+        "conditions": [
+          "NOT_MOUNTED",
+          "DUAL_WIELDING_ANY"
+        ],
+        "combo": 2,
+        "hitbox": "FORWARD_BOX",
+        "damage_multiplier": 1.2,
+        "angle": 0,
+        "upswing": 0.5,
+        "animation": "bettercombat:one_handed_stab",
+        "swing_sound": {
+          "id": "bettercombat:claymore_stab"
+        }
+      },
+      {
+        "conditions": [
+          "NOT_MOUNTED",
+          "DUAL_WIELDING_ANY"
+        ],
+        "combo": 0,
+        "hitbox": "VERTICAL_PLANE",
+        "damage_multiplier": 1,
+        "angle": 70,
+        "upswing": 0.5,
+        "animation": "bettercombat:one_handed_uppercut_right",
+        "swing_sound": {
+          "id": "bettercombat:claymore_stab"
         }
       }
     ],

@@ -69,9 +69,12 @@ public class PlayerAttackHelper {
                 WeaponAttributes.Attack[] heavyAttacks = attributes.heavyAttacks();
                 for (int i = 0; i < heavyAttacks.length; i++) {
                     var attack = heavyAttacks[i];
-                    if ( attack.combo() <= comboCount) { // Enough combos to use this attack
+                    if ( attack.combo() == null || attack.combo() <= comboCount) { // Enough combos to use this attack
                         WeaponAttributes.Attack[] forcedAttacks = new WeaponAttributes.Attack[] { attack };
                         var attackSelection = selectAttack(0, attributes, player, false, forcedAttacks);
+                        if (attackSelection == null) {
+                            continue;
+                        }
                         var combo = attackSelection.comboState;
                         return new AttackHand(attack, combo, false, attributes, itemStack);
                     }
@@ -121,18 +124,7 @@ public class PlayerAttackHelper {
 
     private static AttackSelection selectAttack(int comboCount, WeaponAttributes attributes, PlayerEntity player, boolean isOffHandAttack) {
         var attacks = attributes.attacks();
-        attacks = Arrays.stream(attacks)
-                .filter(attack ->
-                        attack.conditions() == null
-                        || attack.conditions().length == 0
-                        || evaluateConditions(attack.conditions(), player, isOffHandAttack)
-                )
-                .toArray(WeaponAttributes.Attack[]::new);
-        if (comboCount < 0) {
-            comboCount = 0;
-        }
-        int index = comboCount % attacks.length;
-        return new AttackSelection(attacks[index], new ComboState(index + 1, attacks.length));
+        return selectAttack(comboCount, attributes, player, isOffHandAttack, attacks);
     }
 
     private static AttackSelection selectAttack(int comboCount, WeaponAttributes attributes, PlayerEntity player, boolean isOffHandAttack, WeaponAttributes.Attack[] attacks ) {
@@ -145,6 +137,9 @@ public class PlayerAttackHelper {
                 .toArray(WeaponAttributes.Attack[]::new);
         if (comboCount < 0) {
             comboCount = 0;
+        }
+        if ( attacks.length == 0 ) {
+            return null;
         }
         int index = comboCount % attacks.length;
         return new AttackSelection(attacks[index], new ComboState(index + 1, attacks.length));
