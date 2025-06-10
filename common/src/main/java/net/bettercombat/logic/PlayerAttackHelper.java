@@ -46,6 +46,17 @@ public class PlayerAttackHelper {
     }
 
     public static AttackHand getCurrentAttack(PlayerEntity player, int comboCount) {
+        if (player.getVehicle() != null ) {// Mounted to something
+            var itemStack = player.getMainHandStack();
+            WeaponAttributes attributes = WeaponRegistry.getAttributes(itemStack);
+            if ( attributes != null && attributes.mountedAttack() != null ) {
+                var attack = attributes.mountedAttack();
+                WeaponAttributes.Attack[] attacks = new WeaponAttributes.Attack[] { attack };
+                var attackSelection = selectAttack(comboCount, attributes, player, false, attacks);
+                var combo = attackSelection.comboState;
+                return new AttackHand(attack, combo, false, attributes, itemStack);
+            } // If the weapon is unsupported the statement never returns, and moves to other checks
+        }
         if (isDualWielding(player)) {
             boolean isOffHand = shouldAttackWithOffHand(player,comboCount);
             var itemStack = isOffHand

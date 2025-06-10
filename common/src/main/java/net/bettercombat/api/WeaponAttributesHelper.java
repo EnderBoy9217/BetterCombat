@@ -65,7 +65,9 @@ public class WeaponAttributesHelper {
 
             twoHandedAttacks = overrideTwoHandedAttacks.toArray(new WeaponAttributes.Attack[0]);
         }
-        return new WeaponAttributes(attackRange, pose, off_hand_pose, isTwoHanded, category, attacks, twoHandedAttacks );
+        var heavyAttack = b.heavyAttack() != null ? b.heavyAttack() : a.heavyAttack();
+        var mountedAttack  = b.mountedAttack() != null ? b.mountedAttack() : a.mountedAttack();
+        return new WeaponAttributes(attackRange, pose, off_hand_pose, isTwoHanded, category, attacks, twoHandedAttacks, heavyAttack, mountedAttack );
     }
 
     public static void validate(WeaponAttributes attributes) throws Exception {
