@@ -62,6 +62,16 @@ public class PlayerAttackHelper {
         } else {
             var itemStack = player.getMainHandStack();
             WeaponAttributes attributes = WeaponRegistry.getAttributes(itemStack);
+
+            var offhandStack = player.getOffHandStack();
+            if( (offhandStack == null || offhandStack.isEmpty() ) && attributes != null && attributes.twoHandedAttacks() != null) {
+                var attackSelection = selectAttack(comboCount, attributes, player, false, attributes.twoHandedAttacks());
+                var attack = attackSelection.attack;
+                var combo = attackSelection.comboState;
+                return new AttackHand(attack, combo, false, attributes, itemStack);
+            }
+
+
             if (attributes != null && attributes.attacks() != null) {
                 var attackSelection = selectAttack(comboCount, attributes, player, false);
                 var attack = attackSelection.attack;
@@ -81,6 +91,21 @@ public class PlayerAttackHelper {
                         attack.conditions() == null
                         || attack.conditions().length == 0
                         || evaluateConditions(attack.conditions(), player, isOffHandAttack)
+                )
+                .toArray(WeaponAttributes.Attack[]::new);
+        if (comboCount < 0) {
+            comboCount = 0;
+        }
+        int index = comboCount % attacks.length;
+        return new AttackSelection(attacks[index], new ComboState(index + 1, attacks.length));
+    }
+
+    private static AttackSelection selectAttack(int comboCount, WeaponAttributes attributes, PlayerEntity player, boolean isOffHandAttack, WeaponAttributes.Attack[] attacks ) {
+        attacks = Arrays.stream(attacks)
+                .filter(attack ->
+                        attack.conditions() == null
+                                || attack.conditions().length == 0
+                                || evaluateConditions(attack.conditions(), player, isOffHandAttack)
                 )
                 .toArray(WeaponAttributes.Attack[]::new);
         if (comboCount < 0) {
