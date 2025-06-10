@@ -12,7 +12,10 @@
     "PlayerEntityMixin",
     "RangedWeaponItemMixin",
     "ServerPlayNetworkHandlerMixin",
-    "SweepingEnchantmentMixin"
+    "SweepingEnchantmentMixin",
+    "additions.ShieldBreakLivingEntityMixin",
+    "additions.ShieldBreakPlayerEntityMixin",
+    "additions.ShieldMixin"
   ],
   "client": [
     "client.AbstractClientPlayerEntityMixin",

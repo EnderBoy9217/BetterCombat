@@ -310,6 +310,10 @@ public final class WeaponAttributes {
          */
         NO_OFFHAND_ITEM,
         /**
+         * Fulfilled if the player has any item in the off-hand
+         */
+        OFFHAND_ITEM,
+        /**
          * Fulfilled if the player has a shield in the off-hand
          */
         OFF_HAND_SHIELD,

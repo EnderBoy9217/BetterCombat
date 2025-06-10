@@ -49,7 +49,7 @@
     "heavyAttacks": [
       {
         "conditions": [
-          "DUAL_WIELDING_ANY"
+          "OFFHAND_ITEM"
         ],
         "combo": 0,
         "hitbox": "VERTICAL_PLANE",
@@ -91,7 +91,7 @@
       },
       {
         "conditions": [
-          "NOT_DUAL_WIELDING"
+          "NO_OFFHAND_ITEM"
         ],
         "combo": 3,
         "hitbox": "VERTICAL_PLANE",
@@ -105,7 +105,7 @@
       },
       {
         "conditions": [
-          "NOT_DUAL_WIELDING"
+          "NO_OFFHAND_ITEM"
         ],
         "combo": 2,
         "hitbox": "VERTICAL_PLANE",
@@ -119,7 +119,7 @@
       },
       {
         "conditions": [
-          "NOT_DUAL_WIELDING"
+          "NO_OFFHAND_ITEM"
         ],
         "combo": 0,
         "hitbox": "VERTICAL_PLANE",

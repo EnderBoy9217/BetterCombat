@@ -34,6 +34,16 @@
         "damage_multiplier": 0.8,
         "angle": 120,
         "upswing": 0.5,
+        "animation": "bettercombat:one_handed_slash_horizontal_right",
+        "swing_sound": {
+          "id": "bettercombat:sword_slash"
+        }
+      },
+      {
+        "hitbox": "HORIZONTAL_PLANE",
+        "damage_multiplier": 0.8,
+        "angle": 120,
+        "upswing": 0.5,
         "animation": "bettercombat:one_handed_slash_horizontal_left",
         "swing_sound": {
           "id": "bettercombat:sword_slash"
@@ -171,7 +181,7 @@
       {
         "conditions": [
           "NOT_MOUNTED",
-          "DUAL_WIELDING_ANY"
+          "OFFHAND_ITEM"
         ],
         "combo": 2,
         "hitbox": "FORWARD_BOX",
@@ -186,7 +196,7 @@
       {
         "conditions": [
           "NOT_MOUNTED",
-          "DUAL_WIELDING_ANY"
+          "OFFHAND_ITEM"
         ],
         "combo": 0,
         "hitbox": "VERTICAL_PLANE",

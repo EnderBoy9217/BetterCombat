@@ -9,6 +9,10 @@ import java.util.LinkedHashMap;
 
 @Config(name = "server")
 public class ServerConfig implements ConfigData {
+    @Comment("Shield Knockback when hit")
+    public float shield_knockback = 0.5F;
+    @Comment("Maximum Shield Health to disable")
+    public float shield_max_health = 10.0F;
     @Comment("""
             Upswing (aka windup) is the first phase of the attack (between clicking and performing the damage).
             Typical duration of upswing is `weapon cooldown * 0.5`. (Weapon specific upswing values can be defined in weapon attributes)

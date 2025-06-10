@@ -185,6 +185,13 @@ public class PlayerAttackHelper {
                 }}
                 return false;
             }
+            case OFFHAND_ITEM -> {
+                var offhandStack = player.getOffHandStack();
+                if(offhandStack == null || offhandStack.isEmpty()) {{
+                    return false;
+                }}
+                return true;
+            }
             case OFF_HAND_SHIELD -> {
                 var offhandStack = player.getOffHandStack();
                 if(offhandStack != null || offhandStack.getItem() instanceof ShieldItem) {{
