@@ -4,6 +4,9 @@
     "category": "sword",
     "attacks": [
       {
+        "conditions": [
+          "DUAL_WIELDING_SAME"
+        ],
         "hitbox": "HORIZONTAL_PLANE",
         "damage_multiplier": 0.8,
         "angle": 120,
@@ -14,11 +17,14 @@
         }
       },
       {
+        "conditions": [
+          "DUAL_WIELDING_SAME"
+        ],
         "hitbox": "HORIZONTAL_PLANE",
         "damage_multiplier": 0.8,
         "angle": 120,
         "upswing": 0.5,
-        "animation": "bettercombat:one_handed_slash_horizontal_right",
+        "animation": "bettercombat:one_handed_slash_switch_blade_right",
         "swing_sound": {
           "id": "bettercombat:sword_slash"
         }

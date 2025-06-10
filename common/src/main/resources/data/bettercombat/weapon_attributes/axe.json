@@ -4,9 +4,9 @@
     "category": "axe",
     "attacks": [
       {
-        "hitbox": "VERTICAL_PLANE",
+        "hitbox": "HORIZONTAL_PLANE",
         "damage_multiplier": 0.7,
-        "angle": 150,
+        "angle": 90,
         "upswing": 0.5,
         "animation": "bettercombat:one_handed_slash_horizontal_left",
         "swing_sound": {
@@ -16,7 +16,7 @@
       {
         "hitbox": "HORIZONTAL_PLANE",
         "damage_multiplier": 0.7,
-        "angle": 150,
+        "angle": 90,
         "upswing": 0.5,
         "animation": "bettercombat:one_handed_slash_horizontal_right",
         "swing_sound": {
@@ -28,7 +28,7 @@
       {
         "hitbox": "VERTICAL_PLANE",
         "damage_multiplier": 1,
-        "angle": 90,
+        "angle": 50,
         "upswing": 0.5,
         "animation": "bettercombat:two_handed_slash_vertical_right",
         "swing_sound": {
@@ -38,7 +38,7 @@
       {
         "hitbox": "VERTICAL_PLANE",
         "damage_multiplier": 1,
-        "angle": 90,
+        "angle": 50,
         "upswing": 0.5,
         "animation": "bettercombat:two_handed_slash_vertical_left",
         "swing_sound": {
@@ -46,10 +46,96 @@
         }
       }
     ],
+    "heavyAttacks": [
+      {
+        "conditions": [
+          "DUAL_WIELDING_ANY"
+        ],
+        "combo": 0,
+        "hitbox": "VERTICAL_PLANE",
+        "damage_multiplier": 1,
+        "angle": 50,
+        "upswing": 0.5,
+        "animation": "bettercombat:one_handed_slam",
+        "swing_sound": {
+          "id": "bettercombat:claymore_swing"
+        }
+      },
+      {
+        "conditions": [
+          "DUAL_WIELDING_SAME"
+        ],
+        "combo": 4,
+        "hitbox": "HORIZONTAL_PLANE",
+        "damage_multiplier": 1.4,
+        "angle": 50,
+        "upswing": 0.5,
+        "animation": "bettercombat:dual_handed_slash_uncross",
+        "swing_sound": {
+          "id": "bettercombat:mace_slash"
+        }
+      },
+      {
+        "conditions": [
+          "DUAL_WIELDING_SAME"
+        ],
+        "combo": 3,
+        "hitbox": "HORIZONTAL_PLANE",
+        "damage_multiplier": 1.4,
+        "angle": 50,
+        "upswing": 0.5,
+        "animation": "bettercombat:dual_handed_slash_cross",
+        "swing_sound": {
+          "id": "bettercombat:mace_slash"
+        }
+      },
+      {
+        "conditions": [
+          "NOT_DUAL_WIELDING"
+        ],
+        "combo": 3,
+        "hitbox": "VERTICAL_PLANE",
+        "damage_multiplier": 1.5,
+        "angle": 50,
+        "upswing": 0.5,
+        "animation": "bettercombat:two_handed_slam",
+        "swing_sound": {
+          "id": "bettercombat:claymore_slam"
+        }
+      },
+      {
+        "conditions": [
+          "NOT_DUAL_WIELDING"
+        ],
+        "combo": 2,
+        "hitbox": "VERTICAL_PLANE",
+        "damage_multiplier": 1.1,
+        "angle": 150,
+        "upswing": 0.5,
+        "animation": "bettercombat:two_slash_horizontal_right",
+        "swing_sound": {
+          "id": "bettercombat:claymore_swing"
+        }
+      },
+      {
+        "conditions": [
+          "NOT_DUAL_WIELDING"
+        ],
+        "combo": 0,
+        "hitbox": "VERTICAL_PLANE",
+        "damage_multiplier": 1.1,
+        "angle": 150,
+        "upswing": 0.5,
+        "animation": "bettercombat:two_slash_horizontal_left",
+        "swing_sound": {
+          "id": "bettercombat:claymore_swing"
+        }
+      }
+    ],
     "mountedAttack": {
       "hitbox": "HORIZONTAL_PLANE",
       "damage_multiplier": 1.0,
-      "angle": 150,
+      "angle": 120,
       "upswing": 0.5,
       "animation": "bettercombat:one_handed_slash_horizontal_right",
       "swing_sound": {
