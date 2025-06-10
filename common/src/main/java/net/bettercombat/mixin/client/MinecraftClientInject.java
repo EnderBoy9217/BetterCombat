@@ -27,7 +27,10 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.attribute.AttributeContainer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.SwordItem;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -36,10 +39,12 @@ import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import net.minecraft.entity.attribute.EntityAttributes;
 
 import java.util.List;
 
@@ -77,6 +82,9 @@ public abstract class MinecraftClientInject implements MinecraftClient_BetterCom
 
     private void setupTextRenderer() {
         HudRenderCallback.EVENT.register((context, f) -> {
+            if (player == null) return;
+
+            // Render text (existing logic)
             if (textToRender != null && !textToRender.isEmpty()) {
                 var client = MinecraftClient.getInstance();
                 var textRenderer = client.inGameHud.getTextRenderer();
@@ -104,53 +112,113 @@ public abstract class MinecraftClientInject implements MinecraftClient_BetterCom
             if (textFade <= 0) {
                 textToRender = null;
             }
+
+            // Render attack indicator bar
+            if (chargeProgress > 0.0F && BetterCombatClient.ENABLED) {
+                var client = MinecraftClient.getInstance();
+                var scaledWidth = client.getWindow().getScaledWidth();
+                var scaledHeight = client.getWindow().getScaledHeight();
+                int barWidth = 32;
+                int barHeight = 4;
+                int x = scaledWidth / 2 - barWidth / 2; // Center horizontally
+                int y = scaledHeight - 41; // Above hotbar
+                if (!client.interactionManager.hasStatusBars()) {
+                    y += 14;
+                }
+
+                RenderSystem.enableBlend();
+                RenderSystem.defaultBlendFunc();
+
+                // Draw background (semi-transparent black)
+                context.fill(x - 1, y - 1, x + barWidth + 1, y + barHeight + 1, 0x80000000); // Black outline
+                context.fill(x, y, x + barWidth, y + barHeight, 0xFF333333); // Dark gray background
+
+                // Draw filled portion with color gradient (white to red)
+                int fillWidth = (int) (chargeProgress * barWidth);
+                int color = interpolateColor(chargeProgress); // White to red gradient
+                context.fill(x, y, x + fillWidth, y + barHeight, color);
+
+                // Draw outline when fully charged
+                if (chargeProgress >= 1.0F) {
+                    context.fill(x - 1, y - 1, x + barWidth + 1, y, 0xFFFFFFFF); // Top
+                    context.fill(x - 1, y + barHeight, x + barWidth + 1, y + barHeight + 1, 0xFFFFFFFF); // Bottom
+                    context.fill(x - 1, y, x, y + barHeight, 0xFFFFFFFF); // Left
+                    context.fill(x + barWidth, y, x + barWidth + 1, y + barHeight, 0xFFFFFFFF); // Right
+                }
+
+                RenderSystem.disableBlend();
+            }
         });
+    }
+
+    @Unique
+    private int interpolateColor(float progress) {
+        // Interpolate from white (0xFFFFFF) to red (0xFF0000)
+        int red = 0xFF;
+        int green = (int) ((1.0F - progress) * 0xFF);
+        int blue = (int) ((1.0F - progress) * 0xFF);
+        return (0xFF << 24) | (red << 16) | (green << 8) | blue;
     }
 
     // Press to attack
     @Inject(method = "doAttack", at = @At("HEAD"), cancellable = true)
     private void pre_doAttack(CallbackInfoReturnable<Boolean> info) {
         if (!BetterCombatClient.ENABLED) { return; }
-
-        MinecraftClient client = thisClient();
-        WeaponAttributes attributes = WeaponRegistry.getAttributes(client.player.getMainHandStack());
-        if (attributes != null && attributes.attacks() != null) {
-            if (isTargetingMineableBlock() || isHarvesting) {
-                isHarvesting = true;
-                return;
-            }
-            startUpswing(attributes);
-            info.setReturnValue(false);
-            info.cancel();
-        }
+        info.setReturnValue(false);
+        info.cancel();
     }
 
-    // Hold to attack
+    @Unique
+    private int holdTicks = 0; // Add to class fields
+
+    @Unique
+    private float chargeProgress = 0.0F;
+
+    // Hold for heavy attack
     @Inject(method = "handleBlockBreaking", at = @At("HEAD"), cancellable = true)
     private void pre_handleBlockBreaking(boolean bl, CallbackInfo ci) {
         if (!BetterCombatClient.ENABLED) { return; }
 
         MinecraftClient client = thisClient();
         WeaponAttributes attributes = WeaponRegistry.getAttributes(client.player.getMainHandStack());
+        float attackSpeed = 4.0F;
+        ItemStack stack = MinecraftClient.getInstance().player.getMainHandStack();
+        for (var mod : stack.getAttributeModifiers(EquipmentSlot.MAINHAND).get(EntityAttributes.GENERIC_ATTACK_SPEED)) {
+            attackSpeed += mod.getValue();
+        }
         if (attributes != null && attributes.attacks() != null) {
             boolean isPressed = client.options.attackKey.isPressed();
-            if(isPressed && !isHoldingAttackInput) {
+            if (isPressed) {
+                if (!isHoldingAttackInput) {
+                    isHoldingAttackInput = true; // Mark key as held
+                    holdTicks = 0; // Reset hold counter
+                }
+                holdTicks++; // Increment hold duration
+                // Update charge progress
+                chargeProgress = Math.min((float) holdTicks / ( BetterCombat.config.heavy_attack_ticks / attackSpeed ), 1.0F);
                 if (isTargetingMineableBlock() || isHarvesting) {
                     isHarvesting = true;
+                    chargeProgress = 0.0F; // Reset charge when mining
                     return;
-                } else {
-                    ci.cancel();
                 }
-            }
-
-            if (BetterCombatClient.config.isHoldToAttackEnabled && isPressed) {
-                isHoldingAttackInput = true;
-                startUpswing(attributes);
+                ci.cancel(); // Prevent action while holding
+            } else if (isHoldingAttackInput) {
+                // Key was just released
+                isHoldingAttackInput = false;
+                if (isHarvesting) {
+                    isHarvesting = false;
+                    chargeProgress = 0.0F; // Reset charge
+                    return;
+                }
+                startUpswing(attributes, holdTicks >= BetterCombat.config.heavy_attack_ticks / attackSpeed ); // Trigger attack on release
+                chargeProgress = 0.0F; // Reset charge after attack
                 ci.cancel();
             } else {
                 isHarvesting = false;
-                isHoldingAttackInput = false;
+                chargeProgress = 0.0F; // Reset charge when not holding
             }
+        } else {
+            chargeProgress = 0.0F; // Reset charge if no valid weapon
         }
     }
 
@@ -219,7 +287,9 @@ public abstract class MinecraftClientInject implements MinecraftClient_BetterCom
     private float lastSwingDuration = 0;
     private int comboReset = 0;
 
-    private void startUpswing(WeaponAttributes attributes) {
+    private boolean isHeavyAttacking = false;
+
+    private void startUpswing(WeaponAttributes attributes, boolean isHeavy) {
         // Guard conditions
 
         if (player.isRiding()) {
@@ -227,8 +297,8 @@ public abstract class MinecraftClientInject implements MinecraftClient_BetterCom
             // Support for revival mod
             return;
         }
-
-        var hand = getCurrentHand();
+        this.isHeavyAttacking = isHeavy;
+        var hand = getCurrentHand(); // This is the attack
         if (hand == null) { return; }
         float upswingRate = (float) hand.upswingRate();
         if (upswingTicks > 0
@@ -247,6 +317,10 @@ public abstract class MinecraftClientInject implements MinecraftClient_BetterCom
         lastAttacked = 0;
         upswingStack = player.getMainHandStack();
         float attackCooldownTicksFloat = PlayerAttackHelper.getAttackCooldownTicksCapped(player); // `getAttackCooldownProgressPerTick` should be called `getAttackCooldownLengthTicks`
+        if (isHeavy) {
+            attackCooldownTicksFloat *= 1.2F; // Longer cooldown for heavy attacks, will add to config later
+        }
+
         int attackCooldownTicks = Math.round(attackCooldownTicksFloat);
         this.comboReset = Math.round(attackCooldownTicksFloat * BetterCombat.config.combo_reset_rate);
         this.upswingTicks = Math.max(Math.round(attackCooldownTicksFloat * upswingRate), 1); // At least 1 upswing ticks
@@ -313,7 +387,7 @@ public abstract class MinecraftClientInject implements MinecraftClient_BetterCom
 
     private void updateTargetsIfNeeded() {
         if (shouldUpdateTargetsInReach()) {
-            var hand = PlayerAttackHelper.getCurrentAttack(player, getComboCount());
+            var hand = PlayerAttackHelper.getCurrentAttack(player, getComboCount(), isHeavyAttacking);
             WeaponAttributes attributes = WeaponRegistry.getAttributes(player.getMainHandStack());
             List<Entity> targets = List.of();
             if (attributes != null && attributes.attacks() != null) {
@@ -327,9 +401,10 @@ public abstract class MinecraftClientInject implements MinecraftClient_BetterCom
         }
     }
 
-    @Inject(method = "tick",at = @At("HEAD"))
+    @Inject(method = "tick", at = @At("HEAD"))
     private void pre_Tick(CallbackInfo ci) {
         if (player == null) {
+            chargeProgress = 0.0F; // Reset charge if no player
             return;
         }
         targetsInReach = null;
@@ -338,6 +413,10 @@ public abstract class MinecraftClientInject implements MinecraftClient_BetterCom
         attackFromUpswingIfNeeded();
         updateTargetsIfNeeded();
         resetComboIfNeeded();
+        // Reset charge progress if not holding attack key or no valid weapon
+        if (!isHoldingAttackInput || WeaponRegistry.getAttributes(player.getMainHandStack()) == null) {
+            chargeProgress = 0.0F;
+        }
     }
 
     @Inject(method = "tick",at = @At("TAIL"))
@@ -388,7 +467,7 @@ public abstract class MinecraftClientInject implements MinecraftClient_BetterCom
         // ClientPlayerInteractionManager.attackEntity(PlayerEntity player, Entity target)
         ClientPlayNetworking.send(
                 Packets.C2S_AttackRequest.ID,
-                new Packets.C2S_AttackRequest(getComboCount(), player.isSneaking(), player.getInventory().selectedSlot, targets).write());
+                new Packets.C2S_AttackRequest(getComboCount(), isHeavyAttacking, player.isSneaking(), player.getInventory().selectedSlot, targets).write());
         for (var target: targets) {
             player.attack(target);
         }
@@ -398,13 +477,16 @@ public abstract class MinecraftClientInject implements MinecraftClient_BetterCom
         });
 
         setComboCount(getComboCount() + 1);
+        if (isHeavyAttacking) {
+            setComboCount(0);
+        }
         if (!hand.isOffHand()) {
             lastAttacedWithItemStack = hand.itemStack();
         }
     }
 
     private AttackHand getCurrentHand() {
-        return PlayerAttackHelper.getCurrentAttack(player, getComboCount());
+        return PlayerAttackHelper.getCurrentAttack(player, getComboCount(), this.isHeavyAttacking);
     }
 
     private void setComboCount(int comboCount) {

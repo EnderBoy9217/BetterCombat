@@ -27,18 +27,15 @@ import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.decoration.ArmorStandEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.item.SwordItem;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
-import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import org.slf4j.Logger;
 
-import java.util.Collection;
 import java.util.UUID;
 
 public class ServerNetwork {
@@ -91,7 +88,7 @@ public class ServerNetwork {
                 return;
             }
             final var request = Packets.C2S_AttackRequest.read(buf);
-            final var hand = PlayerAttackHelper.getCurrentAttack(player, request.comboCount());
+            final var hand = PlayerAttackHelper.getCurrentAttack(player, request.comboCount(), request.isHeavyAttacking());
             if (hand == null) {
                 LOGGER.error("Server handling Packets.C2S_AttackRequest - No current attack hand!");
                 LOGGER.error("Combo count: " + request.comboCount() + " is dual wielding: " + PlayerAttackHelper.isDualWielding(player));

@@ -2,6 +2,7 @@ package net.bettercombat.api;
 
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 /**
@@ -79,7 +80,7 @@ public final class WeaponAttributes {
     private final Attack[] twoHandedAttacks;
 
     @Nullable
-    private final Attack heavyAttack;
+    private final Attack[] heavyAttacks;
 
     @Nullable
     private final Attack mountedAttack;
@@ -92,7 +93,7 @@ public final class WeaponAttributes {
             String category,
             Attack[] attacks,
             @Nullable Attack[] twoHandedAttacks,
-            @Nullable Attack heavyAttack,
+            @Nullable Attack[] heavyAttacks,
             @Nullable Attack mountedAttack) {
         this.attack_range = attack_range;
         this.pose = pose;
@@ -101,7 +102,7 @@ public final class WeaponAttributes {
         this.category = category;
         this.attacks = attacks;
         this.twoHandedAttacks = twoHandedAttacks;
-        this.heavyAttack = heavyAttack;
+        this.heavyAttacks = heavyAttacks;
         this.mountedAttack = mountedAttack;
     }
 
@@ -179,6 +180,11 @@ public final class WeaponAttributes {
         private Sound impact_sound = null;
 
         /**
+         * How many previous attacks are necessary to use this attack
+         */
+        private Integer combo = null;
+
+        /**
          * This empty initializer is needed for GSON, to support parsing over default values
          */
         public Attack() { }
@@ -191,7 +197,8 @@ public final class WeaponAttributes {
                 double upswing,
                 String animation,
                 Sound swing_sound,
-                Sound impact_sound
+                Sound impact_sound,
+                Integer combo
         ) {
             this.conditions = conditions;
             this.hitbox = hitbox;
@@ -201,6 +208,7 @@ public final class WeaponAttributes {
             this.animation = animation;
             this.swing_sound = swing_sound;
             this.impact_sound = impact_sound;
+            this.combo = combo;
         }
 
         @Nullable
@@ -236,6 +244,10 @@ public final class WeaponAttributes {
             return impact_sound;
         }
 
+        public Integer combo() {
+            return combo;
+        }
+
         @Override
         public boolean equals(Object obj) {
             if (obj == this) return true;
@@ -247,7 +259,8 @@ public final class WeaponAttributes {
                     Double.doubleToLongBits(this.upswing) == Double.doubleToLongBits(that.upswing) &&
                     Objects.equals(this.animation, that.animation) &&
                     Objects.equals(this.swing_sound, that.swing_sound) &&
-                    Objects.equals(this.impact_sound, that.impact_sound);
+                    Objects.equals(this.impact_sound, that.impact_sound)
+                    && Objects.equals(this.combo, that.combo);
         }
 
         @Override
@@ -445,7 +458,7 @@ public final class WeaponAttributes {
     public Attack[] twoHandedAttacks() { return twoHandedAttacks; }
 
     @Nullable
-    public Attack heavyAttack() { return heavyAttack; }
+    public Attack[] heavyAttacks() { return heavyAttacks; }
 
     @Nullable
     public Attack mountedAttack() { return mountedAttack; }
@@ -458,12 +471,14 @@ public final class WeaponAttributes {
         return Double.doubleToLongBits(this.attack_range) == Double.doubleToLongBits(that.attack_range) &&
                 Objects.equals(this.pose, that.pose) &&
                 Objects.equals(this.two_handed, that.two_handed) &&
-                Objects.equals(this.attacks, that.attacks);
+                Objects.equals(this.attacks, that.attacks) &&
+                Objects.equals(this.heavyAttacks, that.heavyAttacks) &&
+                Objects.equals(this.mountedAttack, that.mountedAttack);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(attack_range, two_handed, attacks);
+        return Objects.hash(attack_range, two_handed, Arrays.hashCode(attacks));
     }
 
     @Override
@@ -472,7 +487,10 @@ public final class WeaponAttributes {
                 "attack_range=" + attack_range + ", " +
                 "pose=" + pose + ", " +
                 "isTwoHanded=" + two_handed + ", " +
-                "attacks=" + attacks + ']';
+                "attacks=" + Arrays.toString(attacks) + ", " +
+                "heavyAttacks=" + Arrays.toString(heavyAttacks) + ", " +
+                "mountedAttack=" + mountedAttack
+                + ']';
     }
 
 }

@@ -46,6 +46,10 @@ public class PlayerAttackHelper {
     }
 
     public static AttackHand getCurrentAttack(PlayerEntity player, int comboCount) {
+        return getCurrentAttack(player, comboCount, false);
+    }
+
+    public static AttackHand getCurrentAttack(PlayerEntity player, int comboCount, boolean isHeavyAttack) {
         if (player.getVehicle() != null ) {// Mounted to something
             var itemStack = player.getMainHandStack();
             WeaponAttributes attributes = WeaponRegistry.getAttributes(itemStack);
@@ -57,6 +61,26 @@ public class PlayerAttackHelper {
                 return new AttackHand(attack, combo, false, attributes, itemStack);
             } // If the weapon is unsupported the statement never returns, and moves to other checks
         }
+
+        if ( isHeavyAttack ) {
+            var itemStack = player.getMainHandStack();
+            WeaponAttributes attributes = WeaponRegistry.getAttributes(itemStack);
+            if ( attributes != null && attributes.heavyAttacks() != null ) {
+                WeaponAttributes.Attack[] heavyAttacks = attributes.heavyAttacks();
+                for (int i = 0; i < heavyAttacks.length; i++) {
+                    var attack = heavyAttacks[i];
+                    if ( attack.combo() <= comboCount) { // Enough combos to use this attack
+                        WeaponAttributes.Attack[] forcedAttacks = new WeaponAttributes.Attack[] { attack };
+                        var attackSelection = selectAttack(0, attributes, player, false, forcedAttacks);
+                        var combo = attackSelection.comboState;
+                        return new AttackHand(attack, combo, false, attributes, itemStack);
+                    }
+
+                }
+                // Move to other attacks if no valid heavies are found
+            }
+        }
+
         if (isDualWielding(player)) {
             boolean isOffHand = shouldAttackWithOffHand(player,comboCount);
             var itemStack = isOffHand

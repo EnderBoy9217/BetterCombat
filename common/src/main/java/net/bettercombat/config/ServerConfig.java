@@ -17,6 +17,8 @@ public class ServerConfig implements ConfigData {
             - `0.5` (default, fast paced attack initiation) upswing typically lasts 25% of the attack cooldown
             - `1.0` (classic setting, realistic attack initiation) upswing typically lasts 50% of the attack cooldown""")
     public float upswing_multiplier = 0.5F;
+    @Comment("Amount of time in ticks the player must hold the attack button to perform a heavy attack.")
+    public int heavy_attack_ticks = 16;
     @Comment("Bypass damage receive throttling of LivingEntity from player attacks.")
     public boolean allow_fast_attacks = true;
     @Comment("Allows client-side target search and server-side attack request execution against currently mounted entity of the player")
