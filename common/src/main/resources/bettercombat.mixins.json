@@ -23,6 +23,7 @@
     "client.ClientPlayerInteractionManagerMixin",
     "client.ClientPlayNetworkHandlerMixin",
     "client.ColliderDebugRenderer",
+    "client.HotbarMixin",
     "client.InGameHudInject",
     "client.MinecraftClientAccessor",
     "client.MinecraftClientInject"
