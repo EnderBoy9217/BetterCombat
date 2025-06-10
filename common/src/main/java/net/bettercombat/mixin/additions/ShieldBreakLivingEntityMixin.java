@@ -20,11 +20,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class ShieldBreakLivingEntityMixin {
 
     @Shadow
-    private int lastAttackedTime;
-
-
-
-    @Shadow
     protected ItemStack activeItemStack;
     /**
      * @author EnderBoy9217

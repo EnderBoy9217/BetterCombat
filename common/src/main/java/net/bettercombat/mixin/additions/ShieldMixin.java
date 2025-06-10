@@ -1,5 +1,6 @@
 package net.bettercombat.mixin.additions;
 
+import net.bettercombat.BetterCombat;
 import net.bettercombat.accessors.ShieldInterface;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -13,9 +14,18 @@ import org.spongepowered.asm.mixin.Unique;
 public class ShieldMixin implements ShieldInterface {
 
     @Unique
-    private float maxShieldHealth = 10F;
+    private float maxShieldHealth = 10;
+
     @Unique
-    private float shieldHealth = 10F;
+    private float getMaxShieldHealth() {
+        maxShieldHealth = BetterCombat.config.shield_max_health;
+        return maxShieldHealth;
+    }
+
+    @Unique
+    private float shieldHealth = maxShieldHealth;
+    @Unique
+    private int shieldRegenTime = 0;
 
     @Unique
     public float getShieldHealth() {
@@ -24,16 +34,29 @@ public class ShieldMixin implements ShieldInterface {
     @Unique
     public void setShieldHealth(float shieldHealth) {
         this.shieldHealth = shieldHealth;
+        restartShieldRegenTime();
+    }
+
+    @Unique
+    public int getShieldRegenTime() {
+        return shieldRegenTime;
+    }
+
+    @Unique
+    public void restartShieldRegenTime() {
+        this.shieldRegenTime = 0;
     }
 
     @Unique
     @Override
     public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
-        if ( shieldHealth != maxShieldHealth && entity instanceof LivingEntity mob) {
-            if (mob.getLastAttackedTime() >= 40) {
-                shieldHealth = maxShieldHealth;
+        if ( shieldHealth != getMaxShieldHealth() && entity instanceof LivingEntity mob) {
+            if (shieldRegenTime >= BetterCombat.config.shield_regen_time) {
+                System.out.println("Healing Shield " + shieldRegenTime);
+                setShieldHealth(getMaxShieldHealth());
             }
         }
+        shieldRegenTime++;
     }
 
 }

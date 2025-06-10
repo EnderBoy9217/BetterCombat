@@ -13,6 +13,8 @@ public class ServerConfig implements ConfigData {
     public float shield_knockback = 0.5F;
     @Comment("Maximum Shield Health to disable")
     public float shield_max_health = 10.0F;
+    @Comment("Maximum Shield Health to disable")
+    public int shield_regen_time = 100;
     @Comment("""
             Upswing (aka windup) is the first phase of the attack (between clicking and performing the damage).
             Typical duration of upswing is `weapon cooldown * 0.5`. (Weapon specific upswing values can be defined in weapon attributes)
