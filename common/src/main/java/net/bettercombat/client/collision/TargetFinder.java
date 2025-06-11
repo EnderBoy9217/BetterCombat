@@ -73,6 +73,7 @@ public class TargetFinder {
                 }
             }
         }
+        result *= BetterCombat.config.mountedRangeMultiplier;
         return result;
     }
 

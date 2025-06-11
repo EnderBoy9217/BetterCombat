@@ -33,6 +33,8 @@ public class ServerConfig implements ConfigData {
     public int heavy_attack_ticks = 10;
     @Comment("A multiplier for the amount of ticks it will take to charge a heavy attack while mounted.")
     public float mountedHeavyMultiplier = 2.0F;
+    @Comment("A range multipler for mounted attacks")
+    public double mountedRangeMultiplier = 2.0;
     @Comment("Cooldown multipler before the next attack after a heavy attack.")
     public float heavy_cooldown_multiplier = 1.5F;
     @Comment("Bypass damage receive throttling of LivingEntity from player attacks.")
