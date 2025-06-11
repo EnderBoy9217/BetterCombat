@@ -188,6 +188,7 @@ public abstract class MinecraftClientInject implements MinecraftClient_BetterCom
         }
         if (attributes != null && attributes.attacks() != null) {
             boolean isPressed = client.options.attackKey.isPressed();
+            int heavyTicks = (int) ((player.getVehicle() != null) ? (BetterCombat.config.heavy_attack_ticks / attackSpeed) * BetterCombat.config.mountedHeavyMultiplier  : (BetterCombat.config.heavy_attack_ticks / attackSpeed ));
             if (isPressed) {
                 if (!isHoldingAttackInput) {
                     isHoldingAttackInput = true; // Mark key as held
@@ -195,7 +196,7 @@ public abstract class MinecraftClientInject implements MinecraftClient_BetterCom
                 }
                 holdTicks++; // Increment hold duration
                 // Update charge progress
-                chargeProgress = Math.min((float) holdTicks / ( BetterCombat.config.heavy_attack_ticks / attackSpeed ), 1.0F);
+                chargeProgress = Math.min((float) holdTicks / heavyTicks, 1.0F);
                 if (isTargetingMineableBlock() || isHarvesting) {
                     isHarvesting = true;
                     chargeProgress = 0.0F; // Reset charge when mining
@@ -210,7 +211,8 @@ public abstract class MinecraftClientInject implements MinecraftClient_BetterCom
                     chargeProgress = 0.0F; // Reset charge
                     return;
                 }
-                startUpswing(attributes, holdTicks >= BetterCombat.config.heavy_attack_ticks / attackSpeed ); // Trigger attack on release
+
+                startUpswing(attributes, holdTicks >= heavyTicks ); // Trigger attack on release
                 chargeProgress = 0.0F; // Reset charge after attack
                 ci.cancel();
             } else {

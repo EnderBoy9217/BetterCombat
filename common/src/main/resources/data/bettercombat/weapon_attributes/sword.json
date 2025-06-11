@@ -180,7 +180,7 @@
           "NOT_MOUNTED",
           "DUAL_WIELDING_SAME"
         ],
-        "combo": 2,
+        "combo": 3,
         "hitbox": "FORWARD_BOX",
         "damage_multiplier": 1.4,
         "angle": 0,
