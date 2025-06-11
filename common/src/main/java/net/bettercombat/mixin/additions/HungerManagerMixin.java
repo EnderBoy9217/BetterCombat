@@ -24,7 +24,7 @@ public class HungerManagerMixin {
     @Unique
     private int secondaryFoodTickTimer = 0;
 
-    @Inject(method = "update", at = @At("TAIL"), cancellable = true)
+    @Inject(method = "update", at = @At("TAIL"))
     private void healOnLessHunger(PlayerEntity player, CallbackInfo ci) {
         System.out.println("HungerManagerMixin.update");
         if (player.getWorld().getGameRules().getBoolean(GameRules.NATURAL_REGENERATION) && this.foodLevel < 18 && this.foodLevel >= BetterCombat.config.minimumHealingHunger && player.canFoodHeal()) {

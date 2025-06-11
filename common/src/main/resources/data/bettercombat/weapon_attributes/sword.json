@@ -75,6 +75,18 @@
     "heavyAttacks": [
       {
         "conditions": [
+          "MOUNTED"
+        ],
+        "damage_multiplier": 1.5,
+        "hitbox": "FORWARD_BOX",
+        "upswing": 0.5,
+        "animation": "bettercombat:one_handed_stab_mounted",
+        "swing_sound": {
+          "id": "bettercombat:spear_stab"
+        }
+      },
+      {
+        "conditions": [
           "NOT_MOUNTED",
           "NO_OFFHAND_ITEM"
         ],
@@ -210,12 +222,13 @@
       }
     ],
     "mountedAttack": {
+      "hitbox": "HORIZONTAL_PLANE",
       "damage_multiplier": 1,
-      "hitbox": "FORWARD_BOX",
+      "angle": 120,
       "upswing": 0.5,
-      "animation": "bettercombat:one_handed_stab_mounted",
+      "animation": "bettercombat:one_handed_slash_horizontal_right",
       "swing_sound": {
-        "id": "bettercombat:spear_stab"
+        "id": "bettercombat:sword_slash"
       }
     }
   }

@@ -19,7 +19,7 @@ import org.spongepowered.asm.mixin.Unique;
 public class ShieldMixin implements ShieldInterface {
 
     @Unique
-    private float maxShieldHealth = 10;
+    private float maxShieldHealth = 10.0F;
 
     @Unique
     private float getMaxShieldHealth() {
@@ -40,8 +40,10 @@ public class ShieldMixin implements ShieldInterface {
     @Unique
     public void setShieldHealth(float shieldHealth) {
         this.shieldHealth = shieldHealth;
-        restartShieldRegenTime();
         displayShieldHealth();
+        if ( shieldHealth == maxShieldHealth) {
+            restartShieldRegenTime();
+        }
     }
 
     @Unique
@@ -72,10 +74,10 @@ public class ShieldMixin implements ShieldInterface {
         float currentMaxShieldHealth = getMaxShieldHealth();
         if ( shieldHealth != currentMaxShieldHealth && entity instanceof LivingEntity mob) {
             if (shieldRegenTime >= BetterCombat.config.shield_regen_time) {
-                setShieldHealth(getMaxShieldHealth());
+                setShieldHealth(Math.min(currentMaxShieldHealth, shieldHealth+0.25F) );
             }
+            shieldRegenTime++;
         }
-        shieldRegenTime++;
     }
 
 }

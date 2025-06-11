@@ -9,6 +9,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ShieldItem;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 import static net.minecraft.entity.EquipmentSlot.MAINHAND;
 
@@ -29,7 +30,8 @@ public class PlayerAttackHelper {
         var mainAttributes = WeaponRegistry.getAttributes(player.getMainHandStack());
         var offAttributes = WeaponRegistry.getAttributes(player.getOffHandStack());
         return mainAttributes != null && !mainAttributes.isTwoHanded()
-                && offAttributes != null && !offAttributes.isTwoHanded();
+                && offAttributes != null && !offAttributes.isTwoHanded()
+                && player.getVehicle() == null;
     }
 
     public static boolean isTwoHandedWielding(PlayerEntity player) {
@@ -50,7 +52,33 @@ public class PlayerAttackHelper {
     }
 
     public static AttackHand getCurrentAttack(PlayerEntity player, int comboCount, boolean isHeavyAttack) {
-        if (player.getVehicle() != null ) {// Mounted to something
+
+        if ( isHeavyAttack ) {
+            var itemStack = player.getMainHandStack();
+            WeaponAttributes attributes = WeaponRegistry.getAttributes(itemStack);
+            if ( attributes != null && attributes.heavyAttacks() != null ) {
+                WeaponAttributes.Attack[] heavyAttacks = attributes.heavyAttacks();
+
+                for (WeaponAttributes.Attack attack : heavyAttacks) {
+                    if (attack.combo() == null || attack.combo() <= comboCount) { // Enough combos to use this attack
+                        WeaponAttributes.Attack[] forcedAttacks = new WeaponAttributes.Attack[]{attack};
+                        var attackSelection = selectAttack(0, attributes, player, false, forcedAttacks);
+                        if (attackSelection == null) {
+                            continue;
+                        }
+                        if (player.getVehicle() != null && Arrays.stream(attackSelection.attack.conditions()).filter(Objects::nonNull).noneMatch(condition -> condition.equals(WeaponAttributes.Condition.MOUNTED))) {
+                            continue; // Attack does not specifically have the mounted tag
+                        }
+                        var combo = attackSelection.comboState;
+                        return new AttackHand(attack, combo, false, attributes, itemStack);
+                    }
+
+                }
+                // Move to other attacks if no valid heavies are found
+            }
+        }
+
+        if ( player.getVehicle() != null ) {// Mounted to something
             var itemStack = player.getMainHandStack();
             WeaponAttributes attributes = WeaponRegistry.getAttributes(itemStack);
             if ( attributes != null && attributes.mountedAttack() != null ) {
@@ -60,28 +88,6 @@ public class PlayerAttackHelper {
                 var combo = attackSelection.comboState;
                 return new AttackHand(attack, combo, false, attributes, itemStack);
             } // If the weapon is unsupported the statement never returns, and moves to other checks
-        }
-
-        if ( isHeavyAttack ) {
-            var itemStack = player.getMainHandStack();
-            WeaponAttributes attributes = WeaponRegistry.getAttributes(itemStack);
-            if ( attributes != null && attributes.heavyAttacks() != null ) {
-                WeaponAttributes.Attack[] heavyAttacks = attributes.heavyAttacks();
-                for (int i = 0; i < heavyAttacks.length; i++) {
-                    var attack = heavyAttacks[i];
-                    if ( attack.combo() == null || attack.combo() <= comboCount) { // Enough combos to use this attack
-                        WeaponAttributes.Attack[] forcedAttacks = new WeaponAttributes.Attack[] { attack };
-                        var attackSelection = selectAttack(0, attributes, player, false, forcedAttacks);
-                        if (attackSelection == null) {
-                            continue;
-                        }
-                        var combo = attackSelection.comboState;
-                        return new AttackHand(attack, combo, false, attributes, itemStack);
-                    }
-
-                }
-                // Move to other attacks if no valid heavies are found
-            }
         }
 
         if (isDualWielding(player)) {

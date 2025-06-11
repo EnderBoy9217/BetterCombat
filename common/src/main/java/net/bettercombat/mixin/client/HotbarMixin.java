@@ -1,5 +1,6 @@
 package net.bettercombat.mixin.client;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.bettercombat.accessors.HudInterface;
 import net.minecraft.client.MinecraftClient;
@@ -51,6 +52,14 @@ public abstract class HotbarMixin implements HudInterface {
     @Inject(method = "renderCrosshair", at = @At("HEAD"))
     private void renderCustomCrosshair(DrawContext context, CallbackInfo ci) {
         if (shouldDisplayShield) {
+            // Use vanilla-style crosshair blending
+            RenderSystem.blendFuncSeparate(
+                    GlStateManager.SrcFactor.ONE_MINUS_DST_COLOR,
+                    GlStateManager.DstFactor.ONE_MINUS_SRC_COLOR,
+                    GlStateManager.SrcFactor.ONE,
+                    GlStateManager.DstFactor.ZERO
+            );
+
             Identifier broken_texture = new Identifier("bettercombat", "textures/broken_shield.png");
             int x = this.scaledWidth / 2 - 8;
             int y = this.scaledHeight / 2 - 7 + 16;
@@ -58,6 +67,8 @@ public abstract class HotbarMixin implements HudInterface {
 
             Identifier full_texture = new Identifier("bettercombat", "textures/full_shield.png");
             context.drawTexture(full_texture, x, y + amountHidden, 0, amountHidden, 16, 16-amountHidden, 16, 16);
+
+            RenderSystem.defaultBlendFunc(); // Reset blending to default afterward
 
             //ci.cancel(); // Skip default rendering
         }
