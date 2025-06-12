@@ -39,9 +39,10 @@ public class ShieldMixin implements ShieldInterface {
 
     @Unique
     public void setShieldHealth(float shieldHealth) {
+        boolean decrease = shieldHealth < this.shieldHealth;
         this.shieldHealth = shieldHealth;
         displayShieldHealth();
-        if ( shieldHealth == maxShieldHealth) {
+        if ( shieldHealth == maxShieldHealth || decrease ) {
             restartShieldRegenTime();
         }
     }

@@ -12,7 +12,10 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ShieldItem;
+import net.minecraft.item.SwordItem;
 import net.minecraft.registry.tag.DamageTypeTags;
+import net.minecraft.util.Hand;
 import net.minecraft.util.UseAction;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
@@ -61,8 +64,7 @@ public class ShieldBreakLivingEntityMixin {
     @Inject(method = "damage", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;damageShield(F)V"))
     public void damageShield(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
         Item item = this.activeItemStack.getItem();
-        if (item.getUseAction(this.activeItemStack) == UseAction.BLOCK) {
-            // Item can be assumed to be a shield
+        if (item.getUseAction(this.activeItemStack) == UseAction.BLOCK && item instanceof ShieldItem) {
             float maxShieldHealth = BetterCombat.config.shield_max_health;
 
             float damageAmount = amount;
@@ -78,6 +80,16 @@ public class ShieldBreakLivingEntityMixin {
                     player.disableShield(true);
                     ((ShieldInterface) item).setShieldHealth(maxShieldHealth);
                 }
+            }
+        }
+    }
+
+    @Inject(method = "swingHand", at = @At("HEAD"), cancellable = true)
+    public void onSwingHand(Hand hand, CallbackInfo ci) {
+        if ( ((LivingEntity)(Object)this) instanceof PlayerEntity player ) {
+            ItemStack stack = player.getStackInHand(hand);
+            if (stack.getItem() instanceof SwordItem && player.isUsingItem() && stack.getUseAction() == UseAction.BLOCK) {
+                ci.cancel(); // cancel swing animation
             }
         }
     }

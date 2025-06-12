@@ -18,9 +18,11 @@
     "additions.MultishotFixLivingEntityMixin",
     "additions.ShieldBreakLivingEntityMixin",
     "additions.ShieldBreakPlayerEntityMixin",
-    "additions.ShieldMixin"
+    "additions.ShieldMixin",
+    "parry.SwordItemMixin"
   ],
   "client": [
+    "additions.HeldItemRendererMixin",
     "client.AbstractClientPlayerEntityMixin",
     "client.ClientPlayerEntityMixin",
     "client.ClientPlayerInteractionManagerMixin",
