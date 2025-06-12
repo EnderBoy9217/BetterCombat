@@ -11,6 +11,10 @@ import java.util.LinkedHashMap;
 public class ServerConfig implements ConfigData {
     @Comment("Shield Knockback when hit")
     public float shield_knockback = 0.5F;
+    @Comment("Parry window in ticks")
+    public int parry_timing = 6;
+    @Comment("Parry cooldown in ticks after parry window")
+    public int parry_cooldown = 4;
     @Comment("Maximum Shield Health to disable")
     public float shield_max_health = 10.0F;
     @Comment("Maximum Shield Health to disable")

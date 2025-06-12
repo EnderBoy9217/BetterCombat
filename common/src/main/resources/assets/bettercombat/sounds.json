@@ -131,5 +131,10 @@
     "sounds": [
       "bettercombat:wand_swing-01"
     ]
+  },
+  "block": {
+    "sounds": [
+      "bettercombat:block"
+    ]
   }
 }
