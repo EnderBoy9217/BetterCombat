@@ -1,13 +1,11 @@
 package net.bettercombat.mixin.additions;
 
 import net.bettercombat.BetterCombat;
-import net.bettercombat.accessors.HudInterface;
+import net.bettercombat.accessors.LivingEntityShieldInterface;
 import net.bettercombat.accessors.ShieldInterface;
 import net.bettercombat.accessors.SwordItemInterface;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
@@ -32,7 +30,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(LivingEntity.class)
-public class ShieldBreakLivingEntityMixin {
+public class ShieldBreakLivingEntityMixin implements LivingEntityShieldInterface {
 
     @Shadow
     protected ItemStack activeItemStack;
@@ -40,6 +38,15 @@ public class ShieldBreakLivingEntityMixin {
     @Unique
     private boolean shieldStatus = false;
 
+    public boolean getShieldStatus() {
+        return shieldStatus;
+    }
+
+    public void setShieldStatus(boolean value) {
+        this.shieldStatus = value;
+    }
+
+    /*
     @Unique
     private void displayShield(boolean value) {
         if (FabricLoader.getInstance().getEnvironmentType() != EnvType.CLIENT) {
@@ -50,6 +57,7 @@ public class ShieldBreakLivingEntityMixin {
         accessor.setShouldDisplayShield(value);
         shieldStatus = value;
     }
+    */
 
     /**
      * @author EnderBoy9217
@@ -57,14 +65,6 @@ public class ShieldBreakLivingEntityMixin {
      */
     @Overwrite
     public boolean disablesShield() { return false; }
-
-    @Inject(method = "tick", at = @At("TAIL"))
-    public void checkForIcon(CallbackInfo ci) {
-        boolean newStatus = ((LivingEntity)(Object)this).isBlocking();
-        if ( shieldStatus != newStatus ) {
-            displayShield(newStatus);
-        }
-    }
 
     @Inject(method = "damage", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;damageShield(F)V"))
     public void damageShield(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {

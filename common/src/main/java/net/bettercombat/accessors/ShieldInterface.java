@@ -11,5 +11,4 @@ public interface ShieldInterface {
     void setShieldHealth(float shieldHealth);
     int getShieldRegenTime();
     void restartShieldRegenTime();
-    void displayShieldHealth();
 }

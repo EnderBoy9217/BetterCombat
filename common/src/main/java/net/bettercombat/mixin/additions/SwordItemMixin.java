@@ -5,8 +5,6 @@ import net.bettercombat.accessors.HudInterface;
 import net.bettercombat.accessors.SwordItemInterface;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -60,6 +58,7 @@ public class SwordItemMixin implements SwordItemInterface {
     }
 
 
+    /*
     public void changeShieldDisplay(boolean full) {
         if (FabricLoader.getInstance().getEnvironmentType() != EnvType.CLIENT) {
             return;
@@ -73,6 +72,7 @@ public class SwordItemMixin implements SwordItemInterface {
             accessor.setAmountHidden(16); //Empty
         }
     }
+    */
 
 
     /*

@@ -21,6 +21,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(Item.class)
 public class ItemMixin {
 
+
     @Inject(method = "use", at = @At("HEAD"), cancellable = true)
     public void use(World world, PlayerEntity user, Hand hand, CallbackInfoReturnable<TypedActionResult<ItemStack>> cir) {
         if ( (Item)(Object)this instanceof SwordItem sword ) {
@@ -29,7 +30,7 @@ public class ItemMixin {
             if (accessor.getParryCooldown() == 0) {
                 accessor.setParryTime( BetterCombat.config.parry_timing  );
                 accessor.setParryCooldown( BetterCombat.config.parry_timing + BetterCombat.config.parry_cooldown );
-                accessor.changeShieldDisplay(true);
+                //accessor.changeShieldDisplay(true);
             }
 
             accessor.setBlocking(true);
@@ -90,7 +91,7 @@ public class ItemMixin {
             if ( parryTime > 0 ) {
                 accessor.setParryTime(parryTime - 1);
             } else {
-                accessor.changeShieldDisplay(false);
+                //accessor.changeShieldDisplay(false);
             }
         } else if ((Item)(Object)this instanceof SwordItem shield ) {
             ShieldInterface accessor = (ShieldInterface)shield;

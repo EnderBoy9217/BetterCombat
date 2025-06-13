@@ -32,7 +32,11 @@
     "client.HotbarMixin",
     "client.InGameHudInject",
     "client.MinecraftClientAccessor",
-    "client.MinecraftClientInject"
+    "client.MinecraftClientInject",
+    "client.additions.ItemMixinClient",
+    "client.additions.ShieldBreakLivingEntityMixinClient",
+    "client.additions.ShieldMixinClient",
+    "client.additions.SwordItemMixinClient"
   ],
   "server": [
   ],

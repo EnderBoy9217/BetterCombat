@@ -5,13 +5,11 @@ import net.bettercombat.accessors.HudInterface;
 import net.bettercombat.accessors.ShieldInterface;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ShieldItem;
 import net.minecraft.world.World;
-import net.minecraft.client.gui.hud.InGameHud;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 
@@ -41,7 +39,7 @@ public class ShieldMixin implements ShieldInterface {
     public void setShieldHealth(float shieldHealth) {
         boolean decrease = shieldHealth < this.shieldHealth;
         this.shieldHealth = shieldHealth;
-        displayShieldHealth();
+        //displayShieldHealth();
         if ( shieldHealth == maxShieldHealth || decrease ) {
             restartShieldRegenTime();
         }
@@ -58,6 +56,7 @@ public class ShieldMixin implements ShieldInterface {
     }
 
 
+    /*
     public void displayShieldHealth() {
         if (FabricLoader.getInstance().getEnvironmentType() != EnvType.CLIENT) {
             return;
@@ -68,6 +67,7 @@ public class ShieldMixin implements ShieldInterface {
 
         accessor.setAmountHidden(16-(int)percentage);
     }
+     */
 
     /*
     @Unique
