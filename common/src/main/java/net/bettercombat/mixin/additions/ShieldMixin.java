@@ -45,16 +45,17 @@ public class ShieldMixin implements ShieldInterface {
         }
     }
 
-
     public int getShieldRegenTime() {
         return shieldRegenTime;
     }
 
+    public void setShieldRegenTime(int shieldRegenTime) {
+        this.shieldRegenTime = shieldRegenTime;
+    }
 
     public void restartShieldRegenTime() {
         this.shieldRegenTime = 0;
     }
-
 
     /*
     public void displayShieldHealth() {

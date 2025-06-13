@@ -3,10 +3,12 @@ package net.bettercombat.mixin.additions;
 import net.bettercombat.BetterCombat;
 import net.bettercombat.accessors.ShieldInterface;
 import net.bettercombat.accessors.SwordItemInterface;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ShieldItem;
 import net.minecraft.item.SwordItem;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
@@ -30,7 +32,7 @@ public class ItemMixin {
             if (accessor.getParryCooldown() == 0) {
                 accessor.setParryTime( BetterCombat.config.parry_timing  );
                 accessor.setParryCooldown( BetterCombat.config.parry_timing + BetterCombat.config.parry_cooldown );
-                //accessor.changeShieldDisplay(true);
+                accessor.setShouldShowShield(true);
             }
 
             accessor.setBlocking(true);
@@ -79,8 +81,8 @@ public class ItemMixin {
     }
      */
 
-    @Inject(method = "usageTick", at = @At("HEAD"))
-    public void inventoryTick(World world, LivingEntity user, ItemStack stack, int remainingUseTicks, CallbackInfo ci) {
+    @Inject(method = "inventoryTick", at = @At("HEAD"))
+    public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected, CallbackInfo ci) {
         if ( (Item)(Object)this instanceof SwordItem sword ) {
             SwordItemInterface accessor = (SwordItemInterface) sword;
             int parryCooldown = accessor.getParryCooldown();
@@ -91,9 +93,10 @@ public class ItemMixin {
             if ( parryTime > 0 ) {
                 accessor.setParryTime(parryTime - 1);
             } else {
+                accessor.setShouldShowShield(false);
                 //accessor.changeShieldDisplay(false);
             }
-        } else if ((Item)(Object)this instanceof SwordItem shield ) {
+        } else if ((Item)(Object)this instanceof ShieldItem shield ) {
             ShieldInterface accessor = (ShieldInterface)shield;
             float currentMaxShieldHealth = accessor.getMaxShieldHealth();
             float shieldHealth = accessor.getShieldHealth();
@@ -102,7 +105,7 @@ public class ItemMixin {
                 if (shieldRegenTime >= BetterCombat.config.shield_regen_time) {
                     accessor.setShieldHealth(Math.min(currentMaxShieldHealth, shieldHealth+0.25F) );
                 }
-                accessor.setShieldHealth(shieldRegenTime + 1);
+                accessor.setShieldRegenTime(shieldRegenTime + 1);
             }
         }
     }

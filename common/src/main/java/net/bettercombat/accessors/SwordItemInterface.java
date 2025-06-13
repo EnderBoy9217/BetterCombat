@@ -14,7 +14,9 @@ public interface SwordItemInterface {
     int getParryCooldown();
     int getParryTime();
     boolean getBlocking();
+    boolean getShouldShowShield();
     void setParryCooldown(int cooldown);
     void setParryTime(int time);
     void setBlocking(boolean value);
+    void setShouldShowShield(boolean value);
 }

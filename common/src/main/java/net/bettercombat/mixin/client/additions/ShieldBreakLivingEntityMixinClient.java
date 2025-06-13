@@ -57,6 +57,7 @@ public class ShieldBreakLivingEntityMixinClient {
         entityAccessor.setShieldStatus(value);
     }
 
+    /*
     @Inject(method = "damage", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;damageShield(F)V"))
     public void damageShield(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
         Item item = this.activeItemStack.getItem();
@@ -79,4 +80,5 @@ public class ShieldBreakLivingEntityMixinClient {
             }
         }
     }
+     */
 }

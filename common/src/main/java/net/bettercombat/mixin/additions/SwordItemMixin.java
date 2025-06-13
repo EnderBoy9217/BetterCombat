@@ -1,18 +1,7 @@
 package net.bettercombat.mixin.additions;
 
-import net.bettercombat.BetterCombat;
-import net.bettercombat.accessors.HudInterface;
 import net.bettercombat.accessors.SwordItemInterface;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
-import net.minecraft.util.Hand;
-import net.minecraft.util.TypedActionResult;
-import net.minecraft.util.UseAction;
-import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 
@@ -28,11 +17,12 @@ public class SwordItemMixin implements SwordItemInterface {
     @Unique
     private boolean isBlocking = false;
 
+    @Unique
+    private boolean shouldShowShield = false;
 
     public int getParryCooldown() {
         return parryCooldown;
     }
-
 
     public int getParryTime() {
         return parryTime;
@@ -42,21 +32,25 @@ public class SwordItemMixin implements SwordItemInterface {
         isBlocking = value;
     }
 
-
     public boolean getBlocking() {
         return isBlocking;
     }
-
 
     public void setParryCooldown(int cooldown) {
         parryCooldown = cooldown;
     }
 
-
     public void setParryTime(int time) {
         parryTime = time;
     }
 
+    public boolean getShouldShowShield() {
+        return shouldShowShield;
+    }
+
+    public void setShouldShowShield(boolean value) {
+        shouldShowShield = value;
+    }
 
     /*
     public void changeShieldDisplay(boolean full) {
