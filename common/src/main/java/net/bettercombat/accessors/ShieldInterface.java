@@ -7,8 +7,9 @@ import org.spongepowered.asm.mixin.Unique;
 
 public interface ShieldInterface {
     float getShieldHealth();
+    float getMaxShieldHealth();
     void setShieldHealth(float shieldHealth);
-
-    @Unique
-    void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected);
+    int getShieldRegenTime();
+    void restartShieldRegenTime();
+    void displayShieldHealth();
 }

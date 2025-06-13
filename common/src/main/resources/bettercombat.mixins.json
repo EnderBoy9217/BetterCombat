@@ -15,11 +15,12 @@
     "SweepingEnchantmentMixin",
     "additions.EatingCancelLivingEntityMixin",
     "additions.HungerManagerMixin",
+    "additions.ItemMixin",
     "additions.MultishotFixLivingEntityMixin",
     "additions.ShieldBreakLivingEntityMixin",
     "additions.ShieldBreakPlayerEntityMixin",
     "additions.ShieldMixin",
-    "parry.SwordItemMixin"
+    "additions.SwordItemMixin"
   ],
   "client": [
     "additions.HeldItemRendererMixin",

@@ -21,8 +21,8 @@ public class ShieldMixin implements ShieldInterface {
     @Unique
     private float maxShieldHealth = 10.0F;
 
-    @Unique
-    private float getMaxShieldHealth() {
+
+    public float getMaxShieldHealth() {
         maxShieldHealth = BetterCombat.config.shield_max_health;
         return maxShieldHealth;
     }
@@ -47,18 +47,18 @@ public class ShieldMixin implements ShieldInterface {
         }
     }
 
-    @Unique
+
     public int getShieldRegenTime() {
         return shieldRegenTime;
     }
 
-    @Unique
+
     public void restartShieldRegenTime() {
         this.shieldRegenTime = 0;
     }
 
-    @Unique
-    private void displayShieldHealth() {
+
+    public void displayShieldHealth() {
         if (FabricLoader.getInstance().getEnvironmentType() != EnvType.CLIENT) {
             return;
         }
@@ -69,6 +69,7 @@ public class ShieldMixin implements ShieldInterface {
         accessor.setAmountHidden(16-(int)percentage);
     }
 
+    /*
     @Unique
     @Override
     public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
@@ -80,5 +81,6 @@ public class ShieldMixin implements ShieldInterface {
             shieldRegenTime++;
         }
     }
+    */
 
 }

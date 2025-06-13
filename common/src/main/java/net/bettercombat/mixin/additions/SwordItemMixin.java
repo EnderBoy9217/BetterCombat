@@ -1,4 +1,4 @@
-package net.bettercombat.mixin.parry;
+package net.bettercombat.mixin.additions;
 
 import net.bettercombat.BetterCombat;
 import net.bettercombat.accessors.HudInterface;
@@ -30,33 +30,37 @@ public class SwordItemMixin implements SwordItemInterface {
     @Unique
     private boolean isBlocking = false;
 
-    @Unique
+
     public int getParryCooldown() {
         return parryCooldown;
     }
 
-    @Unique
+
     public int getParryTime() {
         return parryTime;
     }
 
-    @Unique
+    public void setBlocking(boolean value) {
+        isBlocking = value;
+    }
+
+
     public boolean getBlocking() {
         return isBlocking;
     }
 
-    @Unique
+
     public void setParryCooldown(int cooldown) {
         parryCooldown = cooldown;
     }
 
-    @Unique
+
     public void setParryTime(int time) {
         parryTime = time;
     }
 
-    @Unique
-    private void changeShieldDisplay(boolean full) {
+
+    public void changeShieldDisplay(boolean full) {
         if (FabricLoader.getInstance().getEnvironmentType() != EnvType.CLIENT) {
             return;
         }
@@ -70,7 +74,8 @@ public class SwordItemMixin implements SwordItemInterface {
         }
     }
 
-    @Unique
+
+    /*
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         ItemStack stack = user.getStackInHand(hand);
@@ -84,6 +89,7 @@ public class SwordItemMixin implements SwordItemInterface {
         user.setCurrentHand(hand); // <-- triggers usage/blocking
         return TypedActionResult.consume(stack);
     }
+
 
     @Unique
     @Override
@@ -123,5 +129,6 @@ public class SwordItemMixin implements SwordItemInterface {
             parryCooldown--;
         }
     }
+     */
 
 }
