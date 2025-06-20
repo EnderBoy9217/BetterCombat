@@ -41,10 +41,7 @@ public class ItemMixin {
                 accessor.setParryCooldown( BetterCombat.config.parry_timing + BetterCombat.config.parry_cooldown );
                 accessor.setShouldShowShield(true);
                 System.out.println(user instanceof ServerPlayerEntity);
-                if ( user instanceof ClientPlayerEntity ) {
-                    ((SwordItemInterfaceClient)sword).changeShieldDisplay(true);
-                }
-                else if ( user instanceof ServerPlayerEntity player ) {
+                if ( user instanceof ServerPlayerEntity player ) {
                     Packets.ShieldHealthUpdate packet = new Packets.ShieldHealthUpdate(1.0F);
                     ServerPlayNetworking.send(player, Packets.ShieldHealthUpdate.ID, packet.write());
                 }
