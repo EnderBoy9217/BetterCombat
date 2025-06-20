@@ -160,13 +160,19 @@ public abstract class MinecraftClientInject implements MinecraftClient_BetterCom
         return (0xFF << 24) | (red << 16) | (green << 8) | blue;
     }
 
+
     // Press to attack
     @Inject(method = "doAttack", at = @At("HEAD"), cancellable = true)
     private void pre_doAttack(CallbackInfoReturnable<Boolean> info) {
         if (!BetterCombatClient.ENABLED) { return; }
-        info.setReturnValue(false);
-        info.cancel();
+        MinecraftClient client = thisClient();
+        WeaponAttributes attributes = WeaponRegistry.getAttributes(client.player.getMainHandStack());
+        if (attributes != null && attributes.attacks() != null) {
+            info.setReturnValue(false);
+            info.cancel();
+        }
     }
+
 
     @Unique
     private int holdTicks = 0; // Add to class fields
@@ -184,7 +190,7 @@ public abstract class MinecraftClientInject implements MinecraftClient_BetterCom
         float attackSpeed = 4.0F;
         ItemStack stack = MinecraftClient.getInstance().player.getMainHandStack();
         for (var mod : stack.getAttributeModifiers(EquipmentSlot.MAINHAND).get(EntityAttributes.GENERIC_ATTACK_SPEED)) {
-            attackSpeed += mod.getValue();
+            attackSpeed += (float) mod.getValue();
         }
         if (attributes != null && attributes.attacks() != null) {
             boolean isPressed = client.options.attackKey.isPressed();
@@ -202,7 +208,7 @@ public abstract class MinecraftClientInject implements MinecraftClient_BetterCom
                     chargeProgress = 0.0F; // Reset charge when mining
                     return;
                 }
-                ci.cancel(); // Prevent action while holding
+                //ci.cancel(); // Prevent action while holding
             } else if (isHoldingAttackInput) {
                 // Key was just released
                 isHoldingAttackInput = false;
@@ -214,7 +220,7 @@ public abstract class MinecraftClientInject implements MinecraftClient_BetterCom
 
                 startUpswing(attributes, holdTicks >= heavyTicks ); // Trigger attack on release
                 chargeProgress = 0.0F; // Reset charge after attack
-                ci.cancel();
+                //ci.cancel();
             } else {
                 isHarvesting = false;
                 chargeProgress = 0.0F; // Reset charge when not holding
