@@ -26,6 +26,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Environment(EnvType.CLIENT)
 public class ItemMixinClient {
 
+    /*
     @Inject(method = "usageTick", at = @At("HEAD"))
     public void showShield(World world, LivingEntity user, ItemStack stack, int remainingUseTicks, CallbackInfo ci) {
         if ( (Item)(Object)this instanceof SwordItem sword ) {
@@ -34,6 +35,7 @@ public class ItemMixinClient {
             clientAccessor.changeShieldDisplay(accessor.getShouldShowShield());
         }
     }
+    */
 
     /*
     @Inject(method = "use", at = @At("HEAD"))
@@ -47,6 +49,7 @@ public class ItemMixinClient {
         }
     }*/
 
+    /*
     @Inject(method = "usageTick", at = @At("HEAD"))
     public void inventoryTick(World world, LivingEntity user, ItemStack stack, int remainingUseTicks, CallbackInfo ci) {
         if ((Item) (Object) this instanceof SwordItem sword) {
@@ -65,5 +68,6 @@ public class ItemMixinClient {
             clientAccessor.setShieldHealthClient(shieldHealth);
         }
     }
+     */
 
 }

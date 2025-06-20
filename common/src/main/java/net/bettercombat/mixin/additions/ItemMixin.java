@@ -3,6 +3,8 @@ package net.bettercombat.mixin.additions;
 import net.bettercombat.BetterCombat;
 import net.bettercombat.accessors.ShieldInterface;
 import net.bettercombat.accessors.SwordItemInterface;
+import net.bettercombat.network.Packets;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -10,6 +12,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ShieldItem;
 import net.minecraft.item.SwordItem;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.UseAction;
@@ -33,6 +36,10 @@ public class ItemMixin {
                 accessor.setParryTime( BetterCombat.config.parry_timing  );
                 accessor.setParryCooldown( BetterCombat.config.parry_timing + BetterCombat.config.parry_cooldown );
                 accessor.setShouldShowShield(true);
+                if (user instanceof ServerPlayerEntity player) {
+                    Packets.ShieldHealthUpdate packet = new Packets.ShieldHealthUpdate(1.0F);
+                    ServerPlayNetworking.send(player, Packets.ShieldHealthUpdate.ID, packet.write());
+                }
             }
 
             accessor.setBlocking(true);
@@ -84,17 +91,21 @@ public class ItemMixin {
     @Inject(method = "inventoryTick", at = @At("HEAD"))
     public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected, CallbackInfo ci) {
         if ( (Item)(Object)this instanceof SwordItem sword ) {
-            SwordItemInterface accessor = (SwordItemInterface) sword;
-            int parryCooldown = accessor.getParryCooldown();
-            if (parryCooldown > 0) {
-                accessor.setParryCooldown(parryCooldown - 1);
-            }
-            int parryTime = accessor.getParryTime();
-            if ( parryTime > 0 ) {
-                accessor.setParryTime(parryTime - 1);
-            } else {
-                accessor.setShouldShowShield(false);
-                //accessor.changeShieldDisplay(false);
+            if (entity instanceof ServerPlayerEntity player) {
+                SwordItemInterface accessor = (SwordItemInterface) sword;
+                int parryCooldown = accessor.getParryCooldown();
+                if (parryCooldown > 0) {
+                    accessor.setParryCooldown(parryCooldown - 1);
+                }
+                int parryTime = accessor.getParryTime();
+                if (parryTime > 0) {
+                    accessor.setParryTime(parryTime - 1);
+                    if (parryTime-1 == 0) {
+                        accessor.setShouldShowShield(false);
+                        Packets.ShieldHealthUpdate packet = new Packets.ShieldHealthUpdate(0.0F);
+                        ServerPlayNetworking.send(player, Packets.ShieldHealthUpdate.ID, packet.write());
+                    }
+                }
             }
         } else if ((Item)(Object)this instanceof ShieldItem shield ) {
             ShieldInterface accessor = (ShieldInterface)shield;
@@ -103,7 +114,16 @@ public class ItemMixin {
             if ( shieldHealth != currentMaxShieldHealth ) {
                 int shieldRegenTime = accessor.getShieldRegenTime();
                 if (shieldRegenTime >= BetterCombat.config.shield_regen_time) {
-                    accessor.setShieldHealth(Math.min(currentMaxShieldHealth, shieldHealth+0.25F) );
+                    float newShieldHealth = Math.min(currentMaxShieldHealth, shieldHealth+0.25F);
+                    if ( newShieldHealth != accessor.getShieldHealth() ) {
+                        accessor.setShieldHealth(newShieldHealth);
+                        if (entity instanceof ServerPlayerEntity player) {
+                            Packets.ShieldHealthUpdate packet = new Packets.ShieldHealthUpdate(newShieldHealth);
+                            ServerPlayNetworking.send(player, Packets.ShieldHealthUpdate.ID, packet.write());
+                            System.out.println("Shield Health: " + newShieldHealth);
+                        }
+                    }
+
                 }
                 accessor.setShieldRegenTime(shieldRegenTime + 1);
             }

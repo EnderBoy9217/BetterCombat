@@ -13,11 +13,6 @@ import org.spongepowered.asm.mixin.Mixin;
 @Mixin(ShieldItem.class)
 public class ShieldMixinClient implements ShieldInterfaceClient {
 
-    public void setShieldHealthClient(float shieldHealth) {
-        //ShieldInterface accessor = (ShieldInterface) ((ShieldItem)(Object)this);
-        displayShieldHealth(shieldHealth);
-    }
-
     public void displayShieldHealth(float shieldHealth) {
         ShieldInterface shieldAccessor = (ShieldInterface) ((ShieldItem)(Object)this);
         InGameHud hud = MinecraftClient.getInstance().inGameHud;

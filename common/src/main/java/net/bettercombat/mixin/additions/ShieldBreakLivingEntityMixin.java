@@ -4,7 +4,9 @@ import net.bettercombat.BetterCombat;
 import net.bettercombat.accessors.LivingEntityShieldInterface;
 import net.bettercombat.accessors.ShieldInterface;
 import net.bettercombat.accessors.SwordItemInterface;
+import net.bettercombat.network.Packets;
 import net.fabricmc.api.EnvType;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
@@ -14,6 +16,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ShieldItem;
 import net.minecraft.item.SwordItem;
 import net.minecraft.registry.tag.DamageTypeTags;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Hand;
@@ -82,10 +85,18 @@ public class ShieldBreakLivingEntityMixin implements LivingEntityShieldInterface
             float shieldHealth = ((ShieldInterface) item).getShieldHealth();
             shieldHealth -= damageAmount;
             ((ShieldInterface) item).setShieldHealth(shieldHealth);
+            if (((LivingEntity) (Object) this) instanceof ServerPlayerEntity player) {
+                Packets.ShieldHealthUpdate packet = new Packets.ShieldHealthUpdate(shieldHealth);
+                ServerPlayNetworking.send(player, Packets.ShieldHealthUpdate.ID, packet.write());
+            }
             if (shieldHealth <= 0) {
                 if (((LivingEntity) (Object) this) instanceof PlayerEntity player) {
                     player.disableShield(true);
                     ((ShieldInterface) item).setShieldHealth(maxShieldHealth);
+                    if (((LivingEntity) (Object) this) instanceof ServerPlayerEntity serverPlayer) {
+                        Packets.ShieldHealthUpdate packet = new Packets.ShieldHealthUpdate(maxShieldHealth);
+                        ServerPlayNetworking.send(serverPlayer, Packets.ShieldHealthUpdate.ID, packet.write());
+                    }
                 }
             }
         }

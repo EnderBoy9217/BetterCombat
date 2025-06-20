@@ -2,11 +2,16 @@ package net.bettercombat.client;
 
 import net.bettercombat.BetterCombat;
 import net.bettercombat.Platform;
+import net.bettercombat.accessors.client.ShieldInterfaceClient;
+import net.bettercombat.accessors.client.SwordItemInterfaceClient;
 import net.bettercombat.client.animation.PlayerAttackAnimatable;
 import net.bettercombat.logic.WeaponRegistry;
 import net.bettercombat.network.Packets;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.ShieldItem;
+import net.minecraft.item.SwordItem;
 import net.minecraft.registry.Registries;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.Identifier;
@@ -65,6 +70,36 @@ public class ClientNetwork {
             // System.out.println("Received server config: " + gson.toJson(config));
             BetterCombat.config = config;
             BetterCombatClient.ENABLED = true;
+        });
+
+        ClientPlayNetworking.registerGlobalReceiver(Packets.ShieldHealthUpdate.ID, (client, handler, buf, responseSender) -> {
+            Packets.ShieldHealthUpdate packet = Packets.ShieldHealthUpdate.read(buf);
+            client.execute(() -> {
+                if (client.player == null) return;
+
+                // Check main hand and off-hand for shields
+                ItemStack mainHand = client.player.getMainHandStack();
+                ItemStack offHand = client.player.getOffHandStack();
+
+                // Call displayShieldHealth on shield items
+                if (mainHand.getItem() instanceof ShieldItem) {
+                    ((ShieldInterfaceClient) mainHand.getItem()).displayShieldHealth( packet.shieldHealth());
+                    System.out.println("Found shield Item " + (packet.shieldHealth()) );
+                }
+                else if (offHand.getItem() instanceof ShieldItem) {
+                    ((ShieldInterfaceClient) offHand.getItem()).displayShieldHealth( packet.shieldHealth());
+                    System.out.println("Found shield Item " + (packet.shieldHealth()) );
+                }
+                else if (mainHand.getItem() instanceof SwordItem) {
+                    ((SwordItemInterfaceClient) mainHand.getItem()).changeShieldDisplay(packet.shieldHealth() == 1.0F);
+                    System.out.println("Found sword Item " + (packet.shieldHealth()) );
+                }
+                else if (offHand.getItem() instanceof SwordItem) {
+                    ((SwordItemInterfaceClient) offHand.getItem()).changeShieldDisplay(packet.shieldHealth() == 1.0F);
+                    System.out.println("Found sword Item " + (packet.shieldHealth()) );
+                }
+
+            });
         });
     }
 }

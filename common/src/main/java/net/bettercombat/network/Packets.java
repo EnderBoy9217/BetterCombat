@@ -98,6 +98,21 @@ public class Packets {
         }
     }
 
+    public record ShieldHealthUpdate(float shieldHealth) {
+        public static Identifier ID = new Identifier(BetterCombat.MODID, "shield_health_update");
+
+        public PacketByteBuf write() {
+            PacketByteBuf buffer = PacketByteBufs.create();
+            buffer.writeFloat(shieldHealth);
+            return buffer;
+        }
+
+        public static ShieldHealthUpdate read(PacketByteBuf buffer) {
+            float shieldHealth = buffer.readFloat();
+            return new ShieldHealthUpdate(shieldHealth);
+        }
+    }
+
     public static class WeaponRegistrySync {
         public static Identifier ID = new Identifier(BetterCombat.MODID, "weapon_registry");
     }
