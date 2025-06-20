@@ -74,7 +74,6 @@ public class ShieldBreakLivingEntityMixin implements LivingEntityShieldInterface
         Item item = this.activeItemStack.getItem();
         if (item.getUseAction(this.activeItemStack) == UseAction.BLOCK && item instanceof ShieldItem) {
             // Shield Blocking
-            System.out.println("Took Damage");
             float maxShieldHealth = BetterCombat.config.shield_max_health;
 
             float damageAmount = amount;

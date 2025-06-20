@@ -3,8 +3,11 @@ package net.bettercombat.mixin.additions;
 import net.bettercombat.BetterCombat;
 import net.bettercombat.accessors.ShieldInterface;
 import net.bettercombat.accessors.SwordItemInterface;
+import net.bettercombat.accessors.client.SwordItemInterfaceClient;
 import net.bettercombat.network.Packets;
+import net.fabricmc.api.EnvType;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -32,11 +35,16 @@ public class ItemMixin {
         if ( (Item)(Object)this instanceof SwordItem sword ) {
             SwordItemInterface accessor = (SwordItemInterface)sword;
             ItemStack stack = user.getStackInHand(hand);
+            System.out.println(accessor.getParryCooldown());
             if (accessor.getParryCooldown() == 0) {
                 accessor.setParryTime( BetterCombat.config.parry_timing  );
                 accessor.setParryCooldown( BetterCombat.config.parry_timing + BetterCombat.config.parry_cooldown );
                 accessor.setShouldShowShield(true);
-                if (user instanceof ServerPlayerEntity player) {
+                System.out.println(user instanceof ServerPlayerEntity);
+                if ( user instanceof ClientPlayerEntity ) {
+                    ((SwordItemInterfaceClient)sword).changeShieldDisplay(true);
+                }
+                else if ( user instanceof ServerPlayerEntity player ) {
                     Packets.ShieldHealthUpdate packet = new Packets.ShieldHealthUpdate(1.0F);
                     ServerPlayNetworking.send(player, Packets.ShieldHealthUpdate.ID, packet.write());
                 }
@@ -100,7 +108,7 @@ public class ItemMixin {
                 int parryTime = accessor.getParryTime();
                 if (parryTime > 0) {
                     accessor.setParryTime(parryTime - 1);
-                    if (parryTime-1 == 0) {
+                    if ( (parryTime-1) == 0) {
                         accessor.setShouldShowShield(false);
                         Packets.ShieldHealthUpdate packet = new Packets.ShieldHealthUpdate(0.0F);
                         ServerPlayNetworking.send(player, Packets.ShieldHealthUpdate.ID, packet.write());
@@ -120,7 +128,6 @@ public class ItemMixin {
                         if (entity instanceof ServerPlayerEntity player) {
                             Packets.ShieldHealthUpdate packet = new Packets.ShieldHealthUpdate(newShieldHealth);
                             ServerPlayNetworking.send(player, Packets.ShieldHealthUpdate.ID, packet.write());
-                            System.out.println("Shield Health: " + newShieldHealth);
                         }
                     }
 
