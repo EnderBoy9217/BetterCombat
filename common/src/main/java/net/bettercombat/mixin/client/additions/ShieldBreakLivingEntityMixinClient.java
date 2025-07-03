@@ -49,10 +49,13 @@ public class ShieldBreakLivingEntityMixinClient {
         if (FabricLoader.getInstance().getEnvironmentType() != EnvType.CLIENT) {
             return;
         }
-        InGameHud hud = MinecraftClient.getInstance().inGameHud;
-        HudInterface accessor = ((HudInterface)hud);
-        accessor.setShouldDisplayShield(value);
+
         LivingEntity self = (LivingEntity)(Object)this;
+        if (self == MinecraftClient.getInstance().player) {
+            InGameHud hud = MinecraftClient.getInstance().inGameHud;
+            HudInterface accessor = ((HudInterface)hud);
+            accessor.setShouldDisplayShield(value);
+        }
         LivingEntityShieldInterface entityAccessor = (LivingEntityShieldInterface)self;
         entityAccessor.setShieldStatus(value);
     }
