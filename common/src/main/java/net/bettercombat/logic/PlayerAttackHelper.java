@@ -86,6 +86,7 @@ public class PlayerAttackHelper {
                 WeaponAttributes.Attack[] attacks = new WeaponAttributes.Attack[] { attack };
                 var attackSelection = selectAttack(comboCount, attributes, player, false, attacks);
                 var combo = attackSelection.comboState;
+                attributes.setAttackRange(attributes.attackRange() * BetterCombat.config.mountedRangeMultiplier);
                 return new AttackHand(attack, combo, false, attributes, itemStack);
             } // If the weapon is unsupported the statement never returns, and moves to other checks
         }

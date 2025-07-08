@@ -431,6 +431,10 @@ public final class WeaponAttributes {
         return attack_range;
     }
 
+    public void setAttackRange(double newAttackRange) {
+        newAttackRange = this.attack_range;
+    }
+
     @Nullable
     public String pose() {
         return pose;
