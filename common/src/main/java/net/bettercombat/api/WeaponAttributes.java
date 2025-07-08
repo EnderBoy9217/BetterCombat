@@ -13,7 +13,7 @@ public final class WeaponAttributes {
     /**
      * The maximal range of any attacks made with this weapon.
      */
-    private final double attack_range;
+    private double attack_range;
 
     /**
      * The pose animation to play when idling.
@@ -106,6 +106,18 @@ public final class WeaponAttributes {
         this.mountedAttack = mountedAttack;
     }
 
+    public WeaponAttributes(WeaponAttributes that) {
+        this.attack_range = that.attack_range;
+        this.pose = that.pose;
+        this.off_hand_pose = that.off_hand_pose;
+        this.two_handed = that.two_handed;
+        this.category = that.category;
+        this.attacks = that.attacks;
+        this.twoHandedAttacks = that.twoHandedAttacks;
+        this.heavyAttacks = that.heavyAttacks;
+        this.mountedAttack = that.mountedAttack;
+    }
+
     /**
      * Represents a single weapon swing.
      */
@@ -179,6 +191,8 @@ public final class WeaponAttributes {
          */
         private Sound impact_sound = null;
 
+        private double attack_range_multiplier = 1.0F;
+
         /**
          * How many previous attacks are necessary to use this attack
          */
@@ -209,6 +223,30 @@ public final class WeaponAttributes {
             this.swing_sound = swing_sound;
             this.impact_sound = impact_sound;
             this.combo = combo;
+        }
+
+        public Attack(
+                Condition[] conditions,
+                HitBoxShape hitbox,
+                double damage_multiplier,
+                double angle,
+                double upswing,
+                String animation,
+                Sound swing_sound,
+                Sound impact_sound,
+                Integer combo,
+                double attack_range_multiplier
+        ) {
+            this.conditions = conditions;
+            this.hitbox = hitbox;
+            this.damage_multiplier = damage_multiplier;
+            this.angle = angle;
+            this.upswing = upswing;
+            this.animation = animation;
+            this.swing_sound = swing_sound;
+            this.impact_sound = impact_sound;
+            this.combo = combo;
+            this.attack_range_multiplier = attack_range_multiplier;
         }
 
         @Nullable
@@ -248,6 +286,8 @@ public final class WeaponAttributes {
             return combo;
         }
 
+        public double attackRangeMultiplier() { return attack_range_multiplier; }
+
         @Override
         public boolean equals(Object obj) {
             if (obj == this) return true;
@@ -259,13 +299,14 @@ public final class WeaponAttributes {
                     Double.doubleToLongBits(this.upswing) == Double.doubleToLongBits(that.upswing) &&
                     Objects.equals(this.animation, that.animation) &&
                     Objects.equals(this.swing_sound, that.swing_sound) &&
-                    Objects.equals(this.impact_sound, that.impact_sound)
-                    && Objects.equals(this.combo, that.combo);
+                    Objects.equals(this.impact_sound, that.impact_sound) &&
+                    Objects.equals(this.combo, that.combo) &&
+                    Objects.equals(this.attack_range_multiplier, that.attack_range_multiplier);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(hitbox, damage_multiplier, angle, upswing, animation, swing_sound, impact_sound);
+            return Objects.hash(hitbox, damage_multiplier, angle, upswing, animation, swing_sound, impact_sound, attack_range_multiplier);
         }
 
         @Override
@@ -277,7 +318,8 @@ public final class WeaponAttributes {
                     "upswing=" + upswing + ", " +
                     "animation=" + animation + ", " +
                     "swing_sound=" + swing_sound + ", " +
-                    "impact_sound=" + impact_sound + ']';
+                    "impact_sound=" + impact_sound + ", " +
+                    "attack_range_multiplier" + attack_range_multiplier +']';
         }
     }
 
@@ -432,7 +474,7 @@ public final class WeaponAttributes {
     }
 
     public void setAttackRange(double newAttackRange) {
-        newAttackRange = this.attack_range;
+        this.attack_range = newAttackRange;
     }
 
     @Nullable

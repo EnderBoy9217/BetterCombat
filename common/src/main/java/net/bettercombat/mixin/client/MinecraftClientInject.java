@@ -219,6 +219,7 @@ public abstract class MinecraftClientInject implements MinecraftClient_BetterCom
                 }
 
                 startUpswing(attributes, holdTicks >= heavyTicks ); // Trigger attack on release
+                holdTicks = 0;
                 chargeProgress = 0.0F; // Reset charge after attack
                 //ci.cancel();
             } else {

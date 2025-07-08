@@ -70,7 +70,14 @@ public class PlayerAttackHelper {
                             continue; // Attack does not specifically have the mounted tag
                         }
                         var combo = attackSelection.comboState;
-                        return new AttackHand(attack, combo, false, attributes, itemStack);
+                        System.out.println(attackSelection.attack.attackRangeMultiplier());
+                        System.out.println(attributes.attackRange());
+                        System.out.print("Total: ");
+                        System.out.println( attributes.attackRange() * attackSelection.attack.attackRangeMultiplier() );
+
+                        WeaponAttributes tempWeaponAttributes = new WeaponAttributes(attributes); // Create new object to avoid permanent multiplication
+                        tempWeaponAttributes.setAttackRange(attributes.attackRange() * attackSelection.attack.attackRangeMultiplier() );
+                        return new AttackHand(attack, combo, false, tempWeaponAttributes, itemStack);
                     }
 
                 }
@@ -86,8 +93,10 @@ public class PlayerAttackHelper {
                 WeaponAttributes.Attack[] attacks = new WeaponAttributes.Attack[] { attack };
                 var attackSelection = selectAttack(comboCount, attributes, player, false, attacks);
                 var combo = attackSelection.comboState;
-                attributes.setAttackRange(attributes.attackRange() * BetterCombat.config.mountedRangeMultiplier);
-                return new AttackHand(attack, combo, false, attributes, itemStack);
+                WeaponAttributes tempWeaponAttributes = new WeaponAttributes(attributes);
+                tempWeaponAttributes.setAttackRange(attributes.attackRange() * attackSelection.attack.attackRangeMultiplier() );
+                tempWeaponAttributes.setAttackRange(attributes.attackRange() * BetterCombat.config.mountedRangeMultiplier);
+                return new AttackHand(attack, combo, false, tempWeaponAttributes, itemStack);
             } // If the weapon is unsupported the statement never returns, and moves to other checks
         }
 
@@ -102,7 +111,9 @@ public class PlayerAttackHelper {
                 var attackSelection = selectAttack(handSpecificComboCount, attributes, player, isOffHand);
                 var attack = attackSelection.attack;
                 var combo = attackSelection.comboState;
-                return new AttackHand(attack, combo, isOffHand, attributes, itemStack);
+                WeaponAttributes tempWeaponAttributes = new WeaponAttributes(attributes);
+                tempWeaponAttributes.setAttackRange(attributes.attackRange() * attackSelection.attack.attackRangeMultiplier() );
+                return new AttackHand(attack, combo, isOffHand, tempWeaponAttributes, itemStack);
             }
         } else {
             var itemStack = player.getMainHandStack();
@@ -113,7 +124,9 @@ public class PlayerAttackHelper {
                 var attackSelection = selectAttack(comboCount, attributes, player, false, attributes.twoHandedAttacks());
                 var attack = attackSelection.attack;
                 var combo = attackSelection.comboState;
-                return new AttackHand(attack, combo, false, attributes, itemStack);
+                WeaponAttributes tempWeaponAttributes = new WeaponAttributes(attributes);
+                tempWeaponAttributes.setAttackRange(attributes.attackRange() * attackSelection.attack.attackRangeMultiplier() );
+                return new AttackHand(attack, combo, false, tempWeaponAttributes, itemStack);
             }
 
 
@@ -121,7 +134,9 @@ public class PlayerAttackHelper {
                 var attackSelection = selectAttack(comboCount, attributes, player, false);
                 var attack = attackSelection.attack;
                 var combo = attackSelection.comboState;
-                return new AttackHand(attack, combo, false, attributes, itemStack);
+                WeaponAttributes tempWeaponAttributes = new WeaponAttributes(attributes);
+                tempWeaponAttributes.setAttackRange(attributes.attackRange() * attackSelection.attack.attackRangeMultiplier() );
+                return new AttackHand(attack, combo, false, tempWeaponAttributes, itemStack);
             }
         }
         return null;
