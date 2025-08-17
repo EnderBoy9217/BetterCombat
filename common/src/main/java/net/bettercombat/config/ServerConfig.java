@@ -14,7 +14,7 @@ public class ServerConfig implements ConfigData {
     @Comment("Parry window in ticks")
     public int parry_timing = 6;
     @Comment("Parry cooldown in ticks after parry window")
-    public int parry_cooldown = 4;
+    public int parry_cooldown = 1;
     @Comment("Maximum Shield Health to disable")
     public float shield_max_health = 10.0F;
     @Comment("Maximum Shield Health to disable")

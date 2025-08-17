@@ -33,10 +33,16 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(LivingEntity.class)
-public class ShieldBreakLivingEntityMixin implements LivingEntityShieldInterface {
+public abstract class ShieldBreakLivingEntityMixin implements LivingEntityShieldInterface {
 
     @Shadow
     protected ItemStack activeItemStack;
+
+    @Shadow
+    protected int itemUseTimeLeft;
+
+    @Shadow
+    public abstract boolean isUsingItem();
 
     @Unique
     private boolean shieldStatus = false;
@@ -48,19 +54,6 @@ public class ShieldBreakLivingEntityMixin implements LivingEntityShieldInterface
     public void setShieldStatus(boolean value) {
         this.shieldStatus = value;
     }
-
-    /*
-    @Unique
-    private void displayShield(boolean value) {
-        if (FabricLoader.getInstance().getEnvironmentType() != EnvType.CLIENT) {
-            return;
-        }
-        InGameHud hud = MinecraftClient.getInstance().inGameHud;
-        HudInterface accessor = ((HudInterface)hud);
-        accessor.setShouldDisplayShield(value);
-        shieldStatus = value;
-    }
-    */
 
     /**
      * @author EnderBoy9217
@@ -101,6 +94,20 @@ public class ShieldBreakLivingEntityMixin implements LivingEntityShieldInterface
         }
     }
 
+    @Inject(method = "isBlocking", at = @At("HEAD"), cancellable = true)
+    public void isBlocking(CallbackInfoReturnable<Boolean> cir) {
+        if (this.isUsingItem() && !this.activeItemStack.isEmpty()) {
+            Item item = this.activeItemStack.getItem();
+            if (item.getUseAction(this.activeItemStack) != UseAction.BLOCK || item instanceof SwordItem) {
+                cir.setReturnValue(false);
+            } else {
+                cir.setReturnValue(item.getMaxUseTime(this.activeItemStack) - this.itemUseTimeLeft >= 5);
+            }
+        } else {
+            cir.setReturnValue(false);
+        }
+    }
+
     @Inject(method = "damage", at = @At("HEAD"), cancellable = true)
     public void parryAttackCancel(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir){
         LivingEntity entity = (LivingEntity) (Object) this;
@@ -117,7 +124,13 @@ public class ShieldBreakLivingEntityMixin implements LivingEntityShieldInterface
 
         if (item instanceof SwordItem sword) {
             SwordItemInterface accessor = (SwordItemInterface) sword;
-            if (accessor.getBlocking() && accessor.getParryTime() > 0 && !(source.isIn(DamageTypeTags.BYPASSES_SHIELD) || source.isIn(DamageTypeTags.IS_EXPLOSION))) {
+            System.out.print("Checking for block, parry time remaining:");
+            System.out.println(accessor.getParryTime());
+            System.out.print("Is blocking:");
+            System.out.println(accessor.getBlocking());
+            System.out.print("Bypasses Shield:");
+            System.out.println(source.isIn(DamageTypeTags.BYPASSES_SHIELD) || source.isIn(DamageTypeTags.IS_EXPLOSION));
+            if (accessor.getBlocking() && accessor.getParryTime() > 0 && !(source.isIn(DamageTypeTags.BYPASSES_SHIELD) || source.isIn(DamageTypeTags.IS_EXPLOSION)) ) {
 
                 entity.getWorld().playSound(
                         null, // Player (null to play for all nearby players)

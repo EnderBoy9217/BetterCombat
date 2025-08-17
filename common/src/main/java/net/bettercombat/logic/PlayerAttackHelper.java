@@ -70,10 +70,10 @@ public class PlayerAttackHelper {
                             continue; // Attack does not specifically have the mounted tag
                         }
                         var combo = attackSelection.comboState;
-                        System.out.println(attackSelection.attack.attackRangeMultiplier());
-                        System.out.println(attributes.attackRange());
-                        System.out.print("Total: ");
-                        System.out.println( attributes.attackRange() * attackSelection.attack.attackRangeMultiplier() );
+                        //System.out.println(attackSelection.attack.attackRangeMultiplier());
+                        //System.out.println(attributes.attackRange());
+                        //System.out.print("Total: ");
+                        //System.out.println( attributes.attackRange() * attackSelection.attack.attackRangeMultiplier() );
 
                         WeaponAttributes tempWeaponAttributes = new WeaponAttributes(attributes); // Create new object to avoid permanent multiplication
                         tempWeaponAttributes.setAttackRange(attributes.attackRange() * attackSelection.attack.attackRangeMultiplier() );

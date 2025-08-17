@@ -5,6 +5,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 import com.mojang.logging.LogUtils;
 import net.bettercombat.BetterCombat;
+import net.bettercombat.accessors.SwordItemInterface;
 import net.bettercombat.logic.PlayerAttackHelper;
 import net.bettercombat.logic.PlayerAttackProperties;
 import net.bettercombat.logic.TargetHelper;
@@ -13,6 +14,7 @@ import net.bettercombat.logic.knockback.ConfigurableKnockback;
 import net.bettercombat.mixin.LivingEntityAccessor;
 import net.bettercombat.utils.MathHelper;
 import net.bettercombat.utils.SoundHelper;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
@@ -28,12 +30,17 @@ import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.SwordItem;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
+import net.minecraft.util.Hand;
+import net.minecraft.util.TypedActionResult;
 import org.slf4j.Logger;
 
 import java.util.UUID;
@@ -230,6 +237,29 @@ public class ServerNetwork {
                 }
                 ((PlayerAttackProperties)player).setComboCount(-1);
             });
+        });
+
+        ServerPlayNetworking.registerGlobalReceiver(Packets.C2S_BlockRequest.ID, (server, player, handler, buf, responseSender) -> {
+            Packets.C2S_BlockRequest packet = Packets.C2S_BlockRequest.read(buf);
+            Hand hand = packet.hand();
+            boolean blockingActive = packet.blockingActive();
+            Item item = player.getStackInHand(hand).getItem();
+            if ( item instanceof SwordItem sword ) {
+                SwordItemInterface accessor = (SwordItemInterface)sword;
+                if (blockingActive) {
+                    if (accessor.getParryCooldown() == 0) {
+                        accessor.setParryTime(BetterCombat.config.parry_timing);
+                        accessor.setParryCooldown(BetterCombat.config.parry_timing + BetterCombat.config.parry_cooldown);
+                        player.setCurrentHand(hand); // <-- triggers usage/blocking
+                        accessor.setBlocking(true);
+                        Packets.ShieldHealthUpdate shieldUpdatePacket = new Packets.ShieldHealthUpdate(1.0F);
+                        ServerPlayNetworking.send(player, Packets.ShieldHealthUpdate.ID, shieldUpdatePacket.write());
+                    }
+                } else {
+                    accessor.setParryTime(0);
+                    accessor.setBlocking(false);
+                }
+            }
         });
     }
 }

@@ -7,6 +7,7 @@ import net.bettercombat.logic.AnimatedHand;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 
 import java.util.List;
@@ -44,6 +45,24 @@ public class Packets {
             int selectedSlot = buffer.readInt();
             int[] ids = buffer.readIntArray();
             return new C2S_AttackRequest(comboCount, isHeavyAttacking, isSneaking, selectedSlot, ids);
+        }
+    }
+
+    public record C2S_BlockRequest(boolean blockingActive, Hand hand) {
+        public static Identifier ID = new Identifier(BetterCombat.MODID, "c2s_blockrequest");
+
+        public PacketByteBuf write() {
+            PacketByteBuf buffer = PacketByteBufs.create();
+            buffer.writeBoolean(blockingActive);
+            buffer.writeInt(hand.ordinal());
+            return buffer;
+        }
+
+        public static C2S_BlockRequest read(PacketByteBuf buffer) {
+            boolean blockingActive = buffer.readBoolean();
+            int handValue = buffer.readInt();
+            Hand hand = (handValue == 0) ? Hand.MAIN_HAND : Hand.OFF_HAND;
+            return new C2S_BlockRequest(blockingActive, hand);
         }
     }
 

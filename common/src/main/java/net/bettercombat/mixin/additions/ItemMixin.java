@@ -6,7 +6,10 @@ import net.bettercombat.accessors.SwordItemInterface;
 import net.bettercombat.accessors.client.SwordItemInterfaceClient;
 import net.bettercombat.network.Packets;
 import net.fabricmc.api.EnvType;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -29,25 +32,18 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(Item.class)
 public class ItemMixin {
 
-
     @Inject(method = "use", at = @At("HEAD"), cancellable = true)
     public void use(World world, PlayerEntity user, Hand hand, CallbackInfoReturnable<TypedActionResult<ItemStack>> cir) {
         if ( (Item)(Object)this instanceof SwordItem sword ) {
             SwordItemInterface accessor = (SwordItemInterface)sword;
             ItemStack stack = user.getStackInHand(hand);
-            System.out.println(accessor.getParryCooldown());
-            if (accessor.getParryCooldown() == 0) {
-                accessor.setParryTime( BetterCombat.config.parry_timing  );
-                accessor.setParryCooldown( BetterCombat.config.parry_timing + BetterCombat.config.parry_cooldown );
+            //System.out.println(accessor.getParryCooldown());
+            if (accessor.getParryCooldown() == 0 && user == MinecraftClient.getInstance().player) {
                 accessor.setShouldShowShield(true);
-                System.out.println(user instanceof ServerPlayerEntity);
-                if ( user instanceof ServerPlayerEntity player ) {
-                    Packets.ShieldHealthUpdate packet = new Packets.ShieldHealthUpdate(1.0F);
-                    ServerPlayNetworking.send(player, Packets.ShieldHealthUpdate.ID, packet.write());
-                }
+                Packets.C2S_BlockRequest packet = new Packets.C2S_BlockRequest(true,hand);
+                ClientPlayNetworking.send(Packets.C2S_BlockRequest.ID, packet.write());
             }
 
-            accessor.setBlocking(true);
             user.setCurrentHand(hand); // <-- triggers usage/blocking
             cir.setReturnValue( TypedActionResult.consume(stack) );
         }
@@ -58,7 +54,15 @@ public class ItemMixin {
         if ( (Item)(Object)this instanceof SwordItem sword ) {
             SwordItemInterface accessor = (SwordItemInterface) sword;
             accessor.setParryTime(0);
-            accessor.setBlocking(false);
+            if (user instanceof ClientPlayerEntity player) {
+                if (stack == user.getStackInHand(Hand.MAIN_HAND)) {
+                    Packets.C2S_BlockRequest packet = new Packets.C2S_BlockRequest(false,Hand.MAIN_HAND);
+                    ClientPlayNetworking.send(Packets.C2S_BlockRequest.ID, packet.write());
+                } else if (stack == user.getStackInHand(Hand.OFF_HAND)) {
+                    Packets.C2S_BlockRequest packet = new Packets.C2S_BlockRequest(false,Hand.OFF_HAND);
+                    ClientPlayNetworking.send(Packets.C2S_BlockRequest.ID, packet.write());
+                }  // If not in any hand doesn't send packet
+            }
         }
     }
 
@@ -78,21 +82,6 @@ public class ItemMixin {
         }
     }
 
-    /*
-    @Inject(method = "usageTick", at = @At("HEAD"))
-    public void usageTick(World world, LivingEntity user, ItemStack stack, int remainingUseTicks, CallbackInfo ci) {
-        if ( (Item)(Object)this instanceof SwordItem sword ) {
-            SwordItemInterface accessor = (SwordItemInterface) sword;
-            int parryTime = accessor.getParryTime();
-            if ( parryTime > 0 ) {
-                accessor.setParryTime(parryTime - 1);
-            } else {
-                accessor.changeShieldDisplay(false);
-            }
-        }
-    }
-     */
-
     @Inject(method = "inventoryTick", at = @At("HEAD"))
     public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected, CallbackInfo ci) {
         if ( (Item)(Object)this instanceof SwordItem sword ) {
@@ -105,8 +94,7 @@ public class ItemMixin {
                 int parryTime = accessor.getParryTime();
                 if (parryTime > 0) {
                     accessor.setParryTime(parryTime - 1);
-                    if ( (parryTime-1) == 0) {
-                        accessor.setShouldShowShield(false);
+                    if ( (parryTime-1) == 0 && stack == player.getActiveItem()) {
                         Packets.ShieldHealthUpdate packet = new Packets.ShieldHealthUpdate(0.0F);
                         ServerPlayNetworking.send(player, Packets.ShieldHealthUpdate.ID, packet.write());
                     }
