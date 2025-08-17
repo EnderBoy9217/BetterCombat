@@ -1,6 +1,7 @@
 package net.bettercombat.mixin.additions;
 
 import net.bettercombat.BetterCombat;
+import net.bettercombat.accessors.HudInterface;
 import net.bettercombat.accessors.ShieldInterface;
 import net.bettercombat.accessors.SwordItemInterface;
 import net.bettercombat.accessors.client.SwordItemInterfaceClient;
@@ -54,6 +55,7 @@ public class ItemMixin {
         if ( (Item)(Object)this instanceof SwordItem sword ) {
             SwordItemInterface accessor = (SwordItemInterface) sword;
             accessor.setParryTime(0);
+            accessor.setShouldShowShield(false);
             if (user instanceof ClientPlayerEntity player) {
                 if (stack == user.getStackInHand(Hand.MAIN_HAND)) {
                     Packets.C2S_BlockRequest packet = new Packets.C2S_BlockRequest(false,Hand.MAIN_HAND);
@@ -94,9 +96,28 @@ public class ItemMixin {
                 int parryTime = accessor.getParryTime();
                 if (parryTime > 0) {
                     accessor.setParryTime(parryTime - 1);
-                    if ( (parryTime-1) == 0 && stack == player.getActiveItem()) {
-                        Packets.ShieldHealthUpdate packet = new Packets.ShieldHealthUpdate(0.0F);
-                        ServerPlayNetworking.send(player, Packets.ShieldHealthUpdate.ID, packet.write());
+                    if ( (parryTime-1) == 0 ) {
+                        Item main = player.getMainHandStack().getItem();
+                        Item offhand = player.getOffHandStack().getItem();
+                        // Prevent from overriding shield
+                        if (!(main instanceof ShieldItem || offhand instanceof ShieldItem) && (sword == main || sword == offhand) )
+                        {
+                            Packets.ShieldHealthUpdate packet = new Packets.ShieldHealthUpdate(0.0F);
+                            ServerPlayNetworking.send(player, Packets.ShieldHealthUpdate.ID, packet.write());
+                        }
+                    }
+                }
+            } else {
+                // Client Sword Item
+                if (entity instanceof ClientPlayerEntity player && player == MinecraftClient.getInstance().player) {
+                    Item main = player.getMainHandStack().getItem();
+                    Item offhand = player.getOffHandStack().getItem();
+                    // Prevent from overriding shield
+                    if (!(main instanceof ShieldItem || offhand instanceof ShieldItem) && (sword == main || sword == offhand) ) {
+                        SwordItemInterface accessor = (SwordItemInterface) sword;
+                        InGameHud hud = MinecraftClient.getInstance().inGameHud;
+                        HudInterface hudaccessor = ((HudInterface) hud);
+                        hudaccessor.setShouldDisplayShield(accessor.getShouldShowShield());
                     }
                 }
             }
