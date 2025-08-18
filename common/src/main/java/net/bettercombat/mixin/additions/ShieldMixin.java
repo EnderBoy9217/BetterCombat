@@ -19,11 +19,12 @@ import org.spongepowered.asm.mixin.Unique;
 public class ShieldMixin implements ShieldInterface {
 
     @Unique
-    private float maxShieldHealth = BetterCombat.config.shield_max_health + (BetterCombat.config.unbreaking_bonus * EnchantmentHelper.getLevel(Enchantments.UNBREAKING, ((ShieldItem)(Object)this).getDefaultStack()));
+    private float maxShieldHealth = 10.0F;
 
 
     public float getMaxShieldHealth() {
         float maxShieldHealth = BetterCombat.config.shield_max_health + (BetterCombat.config.unbreaking_bonus * EnchantmentHelper.getLevel(Enchantments.UNBREAKING, ((ShieldItem)(Object)this).getDefaultStack()));
+        this.maxShieldHealth = maxShieldHealth;
         return maxShieldHealth;
     }
 
