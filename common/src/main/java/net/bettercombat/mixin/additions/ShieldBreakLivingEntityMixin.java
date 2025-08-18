@@ -101,6 +101,7 @@ public abstract class ShieldBreakLivingEntityMixin implements LivingEntityShield
     @Inject(method = "damage", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;damageShield(F)V"))
     public void damageShield(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
         Item item = this.activeItemStack.getItem();
+        ItemStack stack = this.activeItemStack;
         if (item.getUseAction(this.activeItemStack) == UseAction.BLOCK) {
             if (item instanceof ShieldItem) {
                 // Shield Blocking
@@ -112,19 +113,19 @@ public abstract class ShieldBreakLivingEntityMixin implements LivingEntityShield
                     damageAmount *= 0.2F;
                 }
 
-                float shieldHealth = ((ShieldInterface) item).getShieldHealth();
+                float shieldHealth = ((ShieldInterface) item).getShieldHealth(stack);
                 shieldHealth -= damageAmount;
-                ((ShieldInterface) item).setShieldHealth(shieldHealth);
+                ((ShieldInterface) item).setShieldHealth(shieldHealth, stack);
                 if (((LivingEntity) (Object) this) instanceof ServerPlayerEntity player) {
-                    Packets.ShieldHealthUpdate packet = new Packets.ShieldHealthUpdate(shieldHealth);
+                    Packets.ShieldHealthUpdate packet = new Packets.ShieldHealthUpdate(shieldHealth, stack);
                     ServerPlayNetworking.send(player, Packets.ShieldHealthUpdate.ID, packet.write());
                 }
                 if (shieldHealth <= 0) {
                     if (((LivingEntity) (Object) this) instanceof PlayerEntity player) {
                         player.disableShield(true);
-                        ((ShieldInterface) item).setShieldHealth(maxShieldHealth);
+                        ((ShieldInterface) item).setShieldHealth(maxShieldHealth,stack);
                         if (((LivingEntity) (Object) this) instanceof ServerPlayerEntity serverPlayer) {
-                            Packets.ShieldHealthUpdate packet = new Packets.ShieldHealthUpdate(maxShieldHealth);
+                            Packets.ShieldHealthUpdate packet = new Packets.ShieldHealthUpdate(maxShieldHealth, stack);
                             ServerPlayNetworking.send(serverPlayer, Packets.ShieldHealthUpdate.ID, packet.write());
                         }
                     }

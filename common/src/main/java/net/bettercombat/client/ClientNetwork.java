@@ -83,10 +83,10 @@ public class ClientNetwork {
 
                 // Call displayShieldHealth on shield items
                 if (mainHand.getItem() instanceof ShieldItem) {
-                    ((ShieldInterfaceClient) mainHand.getItem()).displayShieldHealth( packet.shieldHealth());
+                    ((ShieldInterfaceClient) mainHand.getItem()).displayShieldHealth( packet.shieldHealth(), packet.itemStack() );
                 }
                 else if (offHand.getItem() instanceof ShieldItem) {
-                    ((ShieldInterfaceClient) offHand.getItem()).displayShieldHealth( packet.shieldHealth());
+                    ((ShieldInterfaceClient) offHand.getItem()).displayShieldHealth( packet.shieldHealth(), packet.itemStack() );
                 }
                 else if (mainHand.getItem() instanceof SwordItem) {
                     ((SwordItemInterfaceClient) mainHand.getItem()).changeShieldDisplay(packet.shieldHealth() == 1.0F);

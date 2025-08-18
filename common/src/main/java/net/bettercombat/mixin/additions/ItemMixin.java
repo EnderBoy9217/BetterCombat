@@ -102,7 +102,7 @@ public class ItemMixin {
                         // Prevent from overriding shield
                         if (!(main instanceof ShieldItem || offhand instanceof ShieldItem) && (sword == main || sword == offhand) )
                         {
-                            Packets.ShieldHealthUpdate packet = new Packets.ShieldHealthUpdate(0.0F);
+                            Packets.ShieldHealthUpdate packet = new Packets.ShieldHealthUpdate(0.0F, stack);
                             ServerPlayNetworking.send(player, Packets.ShieldHealthUpdate.ID, packet.write());
                         }
                     }
@@ -123,22 +123,22 @@ public class ItemMixin {
             }
         } else if ((Item)(Object)this instanceof ShieldItem shield ) {
             ShieldInterface accessor = (ShieldInterface)shield;
-            float currentMaxShieldHealth = accessor.getMaxShieldHealth();
-            float shieldHealth = accessor.getShieldHealth();
+            float currentMaxShieldHealth = accessor.getMaxShieldHealth(stack);
+            float shieldHealth = accessor.getShieldHealth(stack);
             if ( shieldHealth != currentMaxShieldHealth ) {
-                int shieldRegenTime = accessor.getShieldRegenTime();
+                int shieldRegenTime = accessor.getShieldRegenTime(stack);
                 if (shieldRegenTime >= BetterCombat.config.shield_regen_time) {
                     float newShieldHealth = Math.min(currentMaxShieldHealth, shieldHealth+0.25F);
-                    if ( newShieldHealth != accessor.getShieldHealth() ) {
-                        accessor.setShieldHealth(newShieldHealth);
-                        if (entity instanceof ServerPlayerEntity player) {
-                            Packets.ShieldHealthUpdate packet = new Packets.ShieldHealthUpdate(newShieldHealth);
+                    if ( newShieldHealth != accessor.getShieldHealth(stack) ) {
+                        accessor.setShieldHealth(newShieldHealth,stack);
+                        if (entity instanceof ServerPlayerEntity player && stack == player.getActiveItem()) {
+                            Packets.ShieldHealthUpdate packet = new Packets.ShieldHealthUpdate(newShieldHealth, stack);
                             ServerPlayNetworking.send(player, Packets.ShieldHealthUpdate.ID, packet.write());
                         }
                     }
 
                 }
-                accessor.setShieldRegenTime(shieldRegenTime + 1);
+                accessor.setShieldRegenTime(shieldRegenTime + 1, stack);
             }
         }
     }

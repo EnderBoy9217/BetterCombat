@@ -6,10 +6,11 @@ import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Unique;
 
 public interface ShieldInterface {
-    float getShieldHealth();
-    float getMaxShieldHealth();
-    void setShieldHealth(float shieldHealth);
-    int getShieldRegenTime();
-    void restartShieldRegenTime();
-    void setShieldRegenTime(int time);
+    void initMaxShieldHealth(ItemStack stack);
+    float getShieldHealth(ItemStack stack);
+    float getMaxShieldHealth(ItemStack stack);
+    void setShieldHealth(float shieldHealth, ItemStack stack);
+    int getShieldRegenTime(ItemStack stack);
+    void restartShieldRegenTime(ItemStack stack);
+    void setShieldRegenTime(int time, ItemStack stack);
 }

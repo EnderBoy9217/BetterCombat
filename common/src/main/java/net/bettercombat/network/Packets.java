@@ -6,6 +6,7 @@ import net.bettercombat.config.ServerConfig;
 import net.bettercombat.logic.AnimatedHand;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.entity.Entity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
@@ -117,18 +118,29 @@ public class Packets {
         }
     }
 
-    public record ShieldHealthUpdate(float shieldHealth) {
+    public record ShieldHealthUpdate(float shieldHealth, ItemStack stack) {
         public static Identifier ID = new Identifier(BetterCombat.MODID, "shield_health_update");
+
+        @Override
+        public float shieldHealth() {
+            return shieldHealth;
+        }
+
+        public ItemStack itemStack() {
+            return stack;
+        }
 
         public PacketByteBuf write() {
             PacketByteBuf buffer = PacketByteBufs.create();
             buffer.writeFloat(shieldHealth);
+            buffer.writeItemStack(stack);
             return buffer;
         }
 
         public static ShieldHealthUpdate read(PacketByteBuf buffer) {
             float shieldHealth = buffer.readFloat();
-            return new ShieldHealthUpdate(shieldHealth);
+            ItemStack stack = buffer.readItemStack();
+            return new ShieldHealthUpdate(shieldHealth, stack);
         }
     }
 

@@ -244,6 +244,7 @@ public class ServerNetwork {
             Hand hand = packet.hand();
             boolean blockingActive = packet.blockingActive();
             Item item = player.getStackInHand(hand).getItem();
+            ItemStack stack = player.getStackInHand(hand);
             if ( item instanceof SwordItem sword ) {
                 SwordItemInterface accessor = (SwordItemInterface)sword;
                 if (blockingActive) {
@@ -252,7 +253,7 @@ public class ServerNetwork {
                         accessor.setParryCooldown(BetterCombat.config.parry_timing + BetterCombat.config.parry_cooldown);
                         player.setCurrentHand(hand); // <-- triggers usage/blocking
                         accessor.setBlocking(true);
-                        Packets.ShieldHealthUpdate shieldUpdatePacket = new Packets.ShieldHealthUpdate(1.0F);
+                        Packets.ShieldHealthUpdate shieldUpdatePacket = new Packets.ShieldHealthUpdate(1.0F, stack);
                         ServerPlayNetworking.send(player, Packets.ShieldHealthUpdate.ID, shieldUpdatePacket.write());
                     }
                 } else {
