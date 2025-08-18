@@ -28,6 +28,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -62,32 +63,67 @@ public abstract class ShieldBreakLivingEntityMixin implements LivingEntityShield
     @Overwrite
     public boolean disablesShield() { return false; }
 
+    @ModifyVariable(
+            method = "damage",
+            at = @At("HEAD"),
+            argsOnly = true
+    )
+    private float swordBlocking(float amount, DamageSource source) {
+        Item item = this.activeItemStack.getItem();
+        if (item.getUseAction(this.activeItemStack) == UseAction.BLOCK && item instanceof SwordItem
+            && !(source.isIn(DamageTypeTags.IS_PROJECTILE)
+            || source.isIn(DamageTypeTags.BYPASSES_ARMOR)
+            || source.isIn(DamageTypeTags.IS_EXPLOSION))) {
+            return amount * 0.75F;
+        } else {
+            return amount;
+        }
+    }
+
+    @ModifyVariable(
+            method = "takeKnockback",
+            at = @At("HEAD"),
+            argsOnly = true,
+            ordinal = 0 //(Strength)
+    )
+    private double swordBlocksKnockback(double strength, double x, double z) {
+        Item item = this.activeItemStack.getItem();
+        if (item.getUseAction(this.activeItemStack) == UseAction.BLOCK && item instanceof SwordItem) {
+            return strength * 0.75D;
+        } else {
+            return strength;
+        }
+    }
+
+
     @Inject(method = "damage", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;damageShield(F)V"))
     public void damageShield(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
         Item item = this.activeItemStack.getItem();
-        if (item.getUseAction(this.activeItemStack) == UseAction.BLOCK && item instanceof ShieldItem) {
-            // Shield Blocking
-            float maxShieldHealth = BetterCombat.config.shield_max_health;
+        if (item.getUseAction(this.activeItemStack) == UseAction.BLOCK) {
+            if (item instanceof ShieldItem) {
+                // Shield Blocking
+                float maxShieldHealth = BetterCombat.config.shield_max_health;
 
-            float damageAmount = amount;
-            if (source.isIn(DamageTypeTags.IS_PROJECTILE)) {
-                damageAmount *= 0.2F;
-            }
+                float damageAmount = amount;
+                if (source.isIn(DamageTypeTags.IS_PROJECTILE)) {
+                    damageAmount *= 0.2F;
+                }
 
-            float shieldHealth = ((ShieldInterface) item).getShieldHealth();
-            shieldHealth -= damageAmount;
-            ((ShieldInterface) item).setShieldHealth(shieldHealth);
-            if (((LivingEntity) (Object) this) instanceof ServerPlayerEntity player) {
-                Packets.ShieldHealthUpdate packet = new Packets.ShieldHealthUpdate(shieldHealth);
-                ServerPlayNetworking.send(player, Packets.ShieldHealthUpdate.ID, packet.write());
-            }
-            if (shieldHealth <= 0) {
-                if (((LivingEntity) (Object) this) instanceof PlayerEntity player) {
-                    player.disableShield(true);
-                    ((ShieldInterface) item).setShieldHealth(maxShieldHealth);
-                    if (((LivingEntity) (Object) this) instanceof ServerPlayerEntity serverPlayer) {
-                        Packets.ShieldHealthUpdate packet = new Packets.ShieldHealthUpdate(maxShieldHealth);
-                        ServerPlayNetworking.send(serverPlayer, Packets.ShieldHealthUpdate.ID, packet.write());
+                float shieldHealth = ((ShieldInterface) item).getShieldHealth();
+                shieldHealth -= damageAmount;
+                ((ShieldInterface) item).setShieldHealth(shieldHealth);
+                if (((LivingEntity) (Object) this) instanceof ServerPlayerEntity player) {
+                    Packets.ShieldHealthUpdate packet = new Packets.ShieldHealthUpdate(shieldHealth);
+                    ServerPlayNetworking.send(player, Packets.ShieldHealthUpdate.ID, packet.write());
+                }
+                if (shieldHealth <= 0) {
+                    if (((LivingEntity) (Object) this) instanceof PlayerEntity player) {
+                        player.disableShield(true);
+                        ((ShieldInterface) item).setShieldHealth(maxShieldHealth);
+                        if (((LivingEntity) (Object) this) instanceof ServerPlayerEntity serverPlayer) {
+                            Packets.ShieldHealthUpdate packet = new Packets.ShieldHealthUpdate(maxShieldHealth);
+                            ServerPlayNetworking.send(serverPlayer, Packets.ShieldHealthUpdate.ID, packet.write());
+                        }
                     }
                 }
             }
@@ -124,12 +160,12 @@ public abstract class ShieldBreakLivingEntityMixin implements LivingEntityShield
 
         if (item instanceof SwordItem sword) {
             SwordItemInterface accessor = (SwordItemInterface) sword;
-            System.out.print("Checking for block, parry time remaining:");
-            System.out.println(accessor.getParryTime());
-            System.out.print("Is blocking:");
-            System.out.println(accessor.getBlocking());
-            System.out.print("Bypasses Shield:");
-            System.out.println(source.isIn(DamageTypeTags.BYPASSES_SHIELD) || source.isIn(DamageTypeTags.IS_EXPLOSION));
+            //System.out.print("Checking for parry, parry time remaining:");
+            //System.out.println(accessor.getParryTime());
+            //System.out.print("Is blocking:");
+            //System.out.println(accessor.getBlocking());
+            //System.out.print("Bypasses Shield:");
+            //System.out.println(source.isIn(DamageTypeTags.BYPASSES_SHIELD) || source.isIn(DamageTypeTags.IS_EXPLOSION));
             if (accessor.getBlocking() && accessor.getParryTime() > 0 && !(source.isIn(DamageTypeTags.BYPASSES_SHIELD) || source.isIn(DamageTypeTags.IS_EXPLOSION)) ) {
 
                 entity.getWorld().playSound(
