@@ -59,29 +59,4 @@ public class ShieldBreakLivingEntityMixinClient {
         LivingEntityShieldInterface entityAccessor = (LivingEntityShieldInterface)self;
         entityAccessor.setShieldStatus(value);
     }
-
-    /*
-    @Inject(method = "damage", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;damageShield(F)V"))
-    public void damageShield(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
-        Item item = this.activeItemStack.getItem();
-        if (item.getUseAction(this.activeItemStack) == UseAction.BLOCK && item instanceof ShieldItem) {
-            // Shield Blocking
-            float maxShieldHealth = BetterCombat.config.shield_max_health;
-
-            float damageAmount = amount;
-            if (source.isIn(DamageTypeTags.IS_PROJECTILE)) {
-                damageAmount *= 0.2F;
-            }
-
-            float shieldHealth = ((ShieldInterface) item).getShieldHealth();
-            shieldHealth -= damageAmount;
-            ((ShieldInterfaceClient) item).setShieldHealthClient(shieldHealth);
-            if (shieldHealth <= 0) {
-                if (((LivingEntity) (Object) this) instanceof PlayerEntity player) {
-                    ((ShieldInterfaceClient) item).setShieldHealthClient(maxShieldHealth);
-                }
-            }
-        }
-    }
-     */
 }

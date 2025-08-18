@@ -17,6 +17,8 @@ public class ServerConfig implements ConfigData {
     public int parry_cooldown = 4;
     @Comment("Maximum Shield Health to disable")
     public float shield_max_health = 10.0F;
+    @Comment("Additional shield health given by unbreaking")
+    public float unbreaking_bonus = 5.0F;
     @Comment("Maximum Shield Health to disable")
     public int shield_regen_time = 100;
     @Comment("Whether consumables should be cancelled when taking damage")

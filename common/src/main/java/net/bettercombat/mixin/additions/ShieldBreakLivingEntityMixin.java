@@ -8,6 +8,8 @@ import net.bettercombat.network.Packets;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
@@ -102,7 +104,8 @@ public abstract class ShieldBreakLivingEntityMixin implements LivingEntityShield
         if (item.getUseAction(this.activeItemStack) == UseAction.BLOCK) {
             if (item instanceof ShieldItem) {
                 // Shield Blocking
-                float maxShieldHealth = BetterCombat.config.shield_max_health;
+
+                float maxShieldHealth = BetterCombat.config.shield_max_health + (BetterCombat.config.unbreaking_bonus * EnchantmentHelper.getLevel(Enchantments.UNBREAKING, this.activeItemStack));
 
                 float damageAmount = amount;
                 if (source.isIn(DamageTypeTags.IS_PROJECTILE)) {
